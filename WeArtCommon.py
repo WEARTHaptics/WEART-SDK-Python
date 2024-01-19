@@ -1,23 +1,23 @@
-from enum import Enum
+from enum import IntFlag
 
-class TrackingType(Enum):
+class TrackingType(IntFlag):
     DEFAULT = 0
     WEART_HAND = 1
 
-class HandSide(Enum):
+class HandSide(IntFlag):
 	#HSnone = 0	
 	Left = 1 << 0
 	Right = 1 << 1
 
 
-class ActuationPoint(Enum):
+class ActuationPoint(IntFlag):
 	#APnone	= 0
 	Thumb = 1 << 0
 	Index = 1 << 1
 	Middle = 1 << 2
 	Palm = 1 << 3
 
-class TextureType(Enum):
+class TextureType(IntFlag):
 	ClickNormal = 0
 	ClickSoft = 1
 	DoubleClick = 2

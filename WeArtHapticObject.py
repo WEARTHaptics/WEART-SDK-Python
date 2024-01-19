@@ -101,13 +101,12 @@ class WeArtHapticObject:
                 newTex = texEffect.getTexture()
             else:
                 newTex = WeArtTexture()
-            print(vars(newTex))
             if self.weArtTexture == None or (not (newTex == self.weArtTexture)):
                 if not (newTex.active):
                     msg = StopTextureMessage()
                     self.SendMessage(msg)
                 else:
-                    msg = SetTextureMessage(newTex.textureType.value, newTex.textureVelocity, newTex.volume)
+                    msg = SetTextureMessage(newTex.textureType, newTex.textureVelocity, newTex.volume)
                     self.SendMessage(msg)
                 self.weArtTexture = newTex
 
@@ -116,9 +115,9 @@ class WeArtHapticObject:
         hand_sides = [HandSide.Left, HandSide.Right]
         actuation_points = [ActuationPoint.Thumb, ActuationPoint.Index, ActuationPoint.Middle, ActuationPoint.Palm]
         for hs in hand_sides:
-            if hs.value & self.handSideFlag.value:
+            if hs & self.handSideFlag:
                 for ap in actuation_points:
-                    if ap.value & self.actuationPointFlag.value:
+                    if ap & self.actuationPointFlag:
                         msg.setHandSide(hs)
                         msg.setActuationPoint(ap)
                         self.__client.SendMessage(msg)

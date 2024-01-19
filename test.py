@@ -8,14 +8,15 @@ from WeArtEffect import TouchEffect
 
 from WeArtClient import WeArtClient
 import WeArtCommon
+import time
 
 if __name__ == '__main__':
     client = WeArtClient(WeArtCommon.DEFAULT_IP_ADDRESS, WeArtCommon.DEFAULT_TCP_PORT)
     client.Run()
     client.Start()
     hapticObject = WeArtHapticObject(client)
-    hapticObject.handSideFlag = HandSide.Right
-    hapticObject.actuationPointFlag = ActuationPoint.Index
+    hapticObject.handSideFlag = HandSide.Right.value
+    hapticObject.actuationPointFlag = ActuationPoint.Index | ActuationPoint.Middle
     touchEffect = TouchEffect(WeArtTemperature(), WeArtForce(), WeArtTexture())
     temperature = WeArtTemperature()
     temperature.active = True
@@ -32,4 +33,6 @@ if __name__ == '__main__':
         hapticObject.AddEffect(touchEffect)
     else:
         hapticObject.UpdateEffects()
+    
+    time.sleep(10)
     client.Stop()
