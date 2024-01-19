@@ -34,7 +34,7 @@ class WeArtTexture:
     def textureType(self):
         return self.__textureType
     
-    @textureVelocity.setter
+    @textureType.setter
     def textureType(self, texture_type:TextureType):
         lower = TextureType.ClickNormal
         upper = TextureType.DoubleSidedTape
