@@ -4,6 +4,7 @@ import signal
 import time
 from threading import Thread
 from enum import Enum
+import logging
 
 import WeArtCommon
 from WeArtCommon import TrackingType
@@ -12,6 +13,7 @@ from WeArtMessageSerializer import WeArtMessageSerializer
 from  WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 from WeArtMessageListener import WeArtMessageListener
 
+logging.basicConfig()
 
 class WeArtClient:
     messagesSeparator = '~'
@@ -27,6 +29,8 @@ class WeArtClient:
         self.__pendingCallbacks = []
         self.__IP_ADDESS = ip_address
         self.__PORT = port
+        self.__logger = logging.getLogger("WeArtClient")
+        self.__logger.setLevel(logging.DEBUG)
 
     class ErrorType(Enum):
         ConnectionError = 0
@@ -50,13 +54,13 @@ class WeArtClient:
             self.__s = socket.socket()
             server_addr = (self.__IP_ADDESS, self.__PORT)
             self.__s.connect(server_addr)
-            print(f"Connection to server: { server_addr } established.")
+            self.__logger.info(f"Connection to server: { server_addr } established.")
             self.__Connected = True
             self.__NotifyConnectionStatus(True)
             t = Thread(target=self._OnReceive, args = [], daemon=True)
-            #t.run()
+            t.start()
         except socket.error as e:
-            print(f"Unable to connect to server { server_addr }... \n{e}")
+            self.__logger.error(f"Unable to connect to server { server_addr }... \n{e}")
             self.__Connected = False
             self.__NotifyError(self.ErrorType.ConnectionError)
             sys.exit()
@@ -66,23 +70,27 @@ class WeArtClient:
         return self.__Connected
     
     def Close(self):
-        return
+        self.__s.close()
+        self.__Connected = False
+        self.__NotifyConnectionStatus(False)
+
     def StartCalibration(self):
         return
     def StopCalibration(self):
         return
+    
     def SendMessage(self, msg:WeArtMessage.WeArtMessage):
         if not self.__Connected:
             return
         text = self._messageSerializer.Serialize(msg)
         text += self.messagesSeparator
 
-        print(text)
+        self.__logger.debug(f"Message to be sent: { text }")
 
         bytes = self.__s.send(text.encode())
         if bytes == 0:
             self.__Connected = False
-            print("Send failed")
+            self.__logger.error(f"Send message '{ text }' failed")
             self.__s.close()
             self.__NotifyError(self.ErrorType.SendMessageError)
             self.__NotifyConnectionStatus(False)
@@ -90,24 +98,30 @@ class WeArtClient:
 
 
     def AddThimbleTracking(self, trackingObjects: WeArtThimbleTrackingObject):
-        return
+        self.__thimbleTrackingObjects.append(trackingObjects)
+        self.AddMessageListener(trackingObjects)
+    
     def SizeThimbles(self):
-        return
+        return len(self.__thimbleTrackingObjects)
+    
     def AddMessageListener(self, listener: WeArtMessageListener):
-        return
+        self.__messageListeners.append(listener)
+
     def RemoveMessageListener(self, listener: WeArtMessageListener):
-        return
+        if listener in self.__messageListeners:
+            self.__messageListeners.remove(listener)
+
     def AddConnectionStatusCallback(self, callback):
-        return
+        self.__connectionStatusCallbacks.append(callback)
 
     def AddErrorCallback(self, callback):
-        return
+        self.__errorCallbacks.append(callback)
     
     def _OnReceive(self):
         while True:
             data = self.__s.recv(4096)
             str_data = data.decode()
-            print(str_data)
+            self.__logger.debug(f"Received: { str_data }")
             strings = str_data.split(WeArtClient.messagesSeparator)
             messages = []
             for string in strings:
@@ -140,11 +154,3 @@ class WeArtClient:
     def __ClearProcessedCallbacks(self):
         for t in self.__pendingCallbacks:
             t.join()
-
-
-
-if __name__ == '__main__':
-    client = WeArtClient(WeArtCommon.DEFAULT_IP_ADDRESS, WeArtCommon.DEFAULT_TCP_PORT)
-    client.Run()
-    client.Start()
-    client.Stop()

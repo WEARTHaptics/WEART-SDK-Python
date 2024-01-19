@@ -6,16 +6,40 @@ class TrackingType(Enum):
 
 class HandSide(Enum):
 	#HSnone = 0	
-	Left = 1 << 0,
-	Right = 1 << 1,
+	Left = 1 << 0
+	Right = 1 << 1
 
 
 class ActuationPoint(Enum):
 	#APnone	= 0
-	Thumb = 1 << 0,
-	Index = 1 << 1,
-	Middle = 1 << 2,
-	Palm = 1 << 3,
+	Thumb = 1 << 0
+	Index = 1 << 1
+	Middle = 1 << 2
+	Palm = 1 << 3
+
+class TextureType(Enum):
+	ClickNormal = 0
+	ClickSoft = 1
+	DoubleClick = 2
+	AluminiumFineMeshSlow = 3
+	AluminiumFineMeshFast = 4
+	PlasticMeshSlow = 5
+	ProfiledAluminiumMeshMedium = 6
+	ProfiledAluminiumMeshFast = 7
+	RhombAluminiumMeshMedium = 8
+	TextileMeshMedium = 9
+	CrushedRock = 10
+	VenetianGranite = 11
+	SilverOak = 12
+	LaminatedWood = 13
+	ProfiledRubberSlow = 14
+	VelcroHooks = 15
+	VelcroLoops = 16
+	PlasticFoil2 = 17
+	Leather = 18
+	Cotton1 = 19
+	Aluminium = 20
+	DoubleSidedTape = 21
 
 
 

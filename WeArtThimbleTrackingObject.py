@@ -1,7 +1,7 @@
 from WeArtMessageListener import WeArtMessageListener
 from WeArtMessage import WeArtMessage
 from WeArtCommon import HandSide, ActuationPoint
-from WeArtMessage import WeArtMessage
+from WeArtMessage import WeArtMessage, TrackingMessage
 import WeArtCommon
 
 
@@ -13,8 +13,11 @@ class WeArtThimbleTrackingObject(WeArtMessageListener):
         self._abduction = WeArtCommon.defaultAbduction
     
     def OnMessageReceived(self, message: WeArtMessage):
-        return
-    
+        if message.getID == TrackingMessage.ID:
+            # it means that message is actually a TrackingMessage
+            self._closure = message.GetClosure(self._handSide, self._actuation_point)
+            self._abduction = message.GetAbduction(self._handSide, self._actuation_point)
+
     def GetClosure(self):
         return self._closure
     

@@ -13,6 +13,53 @@ def TrackingTypeToString(trackType:TrackingType):
         return "TrackType1"
     else:
 	    return ""
+    
+def StringToHandside(string:str):
+    if (string == "LEFT"):
+        return HandSide.Left
+    elif (string == "RIGHT"):
+        return HandSide.Right
+    else:
+        assert(False)
+        return HandSide.Left
+
+def HandsideToString(hs:HandSide):
+    if (hs == HandSide.Left):
+        return "LEFT"
+    elif (hs == HandSide.Right):
+        return "RIGHT"
+    else:
+        assert(False)
+        return ""
+
+
+def StringToActuationPoint(string:str):
+    if string == "THUMB":
+        return ActuationPoint.Thumb
+    elif string == "INDEX":
+        return ActuationPoint.Index
+    elif string == "MIDDLE":
+        return ActuationPoint.Middle
+    elif string == "PALM":
+        return ActuationPoint.Palm
+    else:
+        assert(False)
+        return ActuationPoint.Thumb
+
+
+def ActuationPointToString(ap: ActuationPoint):
+    if ap == ActuationPoint.Thumb:
+        return "THUMB"
+    elif ap == ActuationPoint.Index:
+        return "INDEX"
+    elif ap == ActuationPoint.Middle:
+        return "MIDDLE"
+    elif ap == ActuationPoint.Palm:
+        return "PALM"
+    else:
+        assert(False)
+        return ""
+
 
 class WeArtMessage:
 	#@brief Allows to get the message ID, used to deserialize the correct message type
@@ -29,10 +76,10 @@ class WeArtMessage:
     def setValues(self):
         return
 
-    def setHandSide(self, handside):
+    def setHandSide(self, handside:HandSide):
         return
 
-    def setActuationPoint(self, actuation_point):
+    def setActuationPoint(self, actuation_point:ActuationPoint):
         return
 
 
@@ -45,6 +92,24 @@ class WeArtMessageNoParams(WeArtMessage):
     # the message carries no value, so return without doint anything
     def setValues(self, values):
         return
+    
+
+
+class WeArtMessageObjectSpecific(WeArtMessage):
+    def __init__(self):
+        self._handSide = None
+        self._actuationPoint = None
+    
+    def setHandSide(self, handside:HandSide):
+        self._handSide = handside
+    
+    def getActuationPoint(self):
+        return self._actuationPoint
+    
+    def setActuationPoint(self, actuation_point:ActuationPoint):
+        self._actuationPoint = actuation_point
+
+
 
 class StartFromClientMessage(WeArtMessageNoParams):
     ID = "StartFromClient"
@@ -104,24 +169,24 @@ class TrackingMessage(WeArtMessageNoParams):
         ret = []
         ret.append(TrackingTypeToString(self._trackingType))
         if self._trackingType == TrackingType.DEFAULT:
-            ret.append(self.__RightThumbClosure)
-            ret.append(self.__RightIndexClosure)
-            ret.append(self.__RightMiddleClosure)
-            ret.append(self.__RightPalmClosure)
-            ret.append(self.__LeftThumbClosure)
-            ret.append(self.__LeftIndexClosure)
-            ret.append(self.__LeftMiddleClosure)
-            ret.append(self.__LeftPalmClosure)
+            ret.append(str(self.__RightThumbClosure))
+            ret.append(str(self.__RightIndexClosure))
+            ret.append(str(self.__RightMiddleClosure))
+            ret.append(str(self.__RightPalmClosure))
+            ret.append(str(self.__LeftThumbClosure))
+            ret.append(str(self.__LeftIndexClosure))
+            ret.append(str(self.__LeftMiddleClosure))
+            ret.append(str(self.__LeftPalmClosure))
         elif self._trackingType == TrackingType.WEART_HAND:
-            ret.append(self.__RightIndexClosure)
-            ret.append(self.__RightThumbClosure)
-            ret.append(self.__RightThumbAbduction)
-            ret.append(self.__RightMiddleClosure)
+            ret.append(str(self.__RightIndexClosure))
+            ret.append(str(self.__RightThumbClosure))
+            ret.append(str(self.__RightThumbAbduction))
+            ret.append(str(self.__RightMiddleClosure))
             
-            ret.append(self.__LeftIndexClosure)
-            ret.append(self.__LeftThumbClosure)
-            ret.append(self.__LeftThumbAbduction)
-            ret.append(self.__LeftMiddleClosure)
+            ret.append(str(self.__LeftIndexClosure))
+            ret.append(str(self.__LeftThumbClosure))
+            ret.append(str(self.__LeftThumbAbduction))
+            ret.append(str(self.__LeftMiddleClosure))
         return ret
     
     def SetValues(self, values:list[str]):
@@ -183,6 +248,153 @@ class TrackingMessage(WeArtMessageNoParams):
                 byteValue = self.__RightPalmClosure
         closure = float(byteValue) / float(255)
         return closure
+    
+class SetTemperatureMessage(WeArtMessageObjectSpecific):
+    ID = "temperature"
+
+    def __init__(self, t:float):
+        super().__init__()
+        self._temperature = t
+    
+    def getID(self):
+        return self.ID
+    
+    def getValues(self):
+        ret = []
+        ret.append(str(self._temperature))
+        ret.append(HandsideToString(self._handSide))
+        ret.append(ActuationPointToString(self._actuationPoint))
+        return ret
+    
+    def setValues(self, values:list[str]):
+        assert(len(values)==3)
+        self._temperature = float(values[0])
+        self._handSide = StringToHandside(values[1])
+        self._actuationPoint= StringToActuationPoint(values[2])
+
+    
+class StopTemperatureMessage(WeArtMessageObjectSpecific):
+    ID = "stopTemperature"
+
+    def __init__(self):
+        super().__init__()
+
+    def getID(self):
+        return self.ID
+    
+
+    def getValues(self):
+        ret = [HandsideToString(self._handSide), ActuationPointToString(self._actuationPoint)]
+        return ret
+    
+    def setValues(self, values: list[str]):
+        assert(len(values) == 2)
+        self._handSide = StringToHandside(values[0])
+        self._actuationPoint = StringToActuationPoint(values[1])
+
+class SetForceMessage(WeArtMessageObjectSpecific):
+    ID = "force"
+
+    def __init__(self, force:list[float]):
+        super().__init__()
+        self._force = force
+
+    def getID(self):
+        return self.ID
+    
+    def getValues(self):
+        ret = []
+        ret.append(str(self._force[0]))
+        ret.append(str(self._force[1]))
+        ret.append(str(self._force[2]))
+        ret.append(HandsideToString(self._handSide))
+        ret.append(ActuationPointToString(self._actuationPoint))
+        return ret
+    
+    def setValues(self, values:list[str]):
+        assert(len(values) == 5)
+        self._force[0] = float(values[0])
+        self._force[1] = float(values[1])
+        self._force[2] = float(values[2])
+        self._handSide = StringToHandside(values[3])
+        self._actuationPoint = StringToActuationPoint(values[4])
+
+class StopForceMessage(WeArtMessageObjectSpecific):
+    ID = "stopForce"
+
+    def __init__(self):
+        super().__init__()
+
+    def getID(self):
+        return self.ID
+    
+
+    def getValues(self):
+        ret = [HandsideToString(self._handSide), ActuationPointToString(self._actuationPoint)]
+        return ret
+    
+    def setValues(self, values: list[str]):
+        assert(len(values) == 2)
+        self._handSide = StringToHandside(values[0])
+        self._actuationPoint = StringToActuationPoint(values[1])
+
+class SetTextureMessage(WeArtMessageObjectSpecific):
+    ID = "texture"
+
+    def __init__(self, idx:int, vel:float, vol:float):
+        super().__init__()
+        self._index = idx
+        self._velocity = [0.5, 0.0, vel]
+        self._volume = vol
+    
+    def getID(self):
+        return self.ID
+
+    def getValues(self):
+        ret = []
+        if (self._index < WeArtCommon.minTextureIndex or self._index > WeArtCommon.maxTextureIndex):
+            self._index = WeArtCommon.nullTextureIndex
+        
+        ret.append(str(self._index))
+        ret.append(str(self._velocity[0]))
+        ret.append(str(self._velocity[1]))
+        ret.append(str(self._velocity[2]))
+        ret.append(str(self._volume))
+        ret.append(HandsideToString(self._handSide))
+        ret.append(ActuationPointToString(self._actuationPoint))
+        return ret
+
+    def setValues(self, values:list[str]):
+        assert(len(values) == 6)
+        self._index = int(values[0])
+        self._velocity = []
+        self._velocity.append(float(values[1]))
+        self._velocity.append(float(values[2]))
+        self._velocity.append(float(values[3]))
+        self._volume = float(values[4])
+        self._handSide = StringToHandside(values[5])
+        self._actuationPoint = StringToActuationPoint(values[6])
+
+
+class StopTextureMessage(WeArtMessageObjectSpecific):
+    ID = "stopTexture"
+
+    def __init__(self):
+        super().__init__()
+
+    def getID(self):
+        return self.ID
+    
+
+    def getValues(self):
+        ret = [HandsideToString(self._handSide), ActuationPointToString(self._actuationPoint)]
+        return ret
+    
+    def setValues(self, values: list[str]):
+        assert(len(values) == 2)
+        self._handSide = StringToHandside(values[0])
+        self._actuationPoint = StringToActuationPoint(values[1])
+  
 
 
 
