@@ -1,4 +1,4 @@
-import WeArtMessage
+import pySDK.WeArtMessages as WeArtMessages
 
 class WeArtMessageSerializer:
     separator = ':'
@@ -22,10 +22,10 @@ class WeArtMessageSerializer:
     @staticmethod
     def createMessage(id:str):
         h = WeArtMessageSerializer.HashStringToInt(id)
-        if (h == WeArtMessageSerializer.HashStringToInt(WeArtMessage.StartFromClientMessage.ID)):
-            return WeArtMessage.StartFromClientMessage()
-        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessage.TrackingMessage.ID)):
-            return WeArtMessage.TrackingMessage()
+        if (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StartFromClientMessage.ID)):
+            return WeArtMessages.StartFromClientMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.TrackingMessage.ID)):
+            return WeArtMessages.TrackingMessage()
         #TODO Continues...
         else: 
             return None
@@ -48,7 +48,7 @@ class WeArtMessageSerializer:
 	# @return the serialized message as string
 	#std::string Serialize(WeArtMessage* message);
     @staticmethod
-    def Serialize(message:WeArtMessage.WeArtMessage):
+    def Serialize(message:WeArtMessages.WeArtMessage):
         messageID = message.getID()
         serializedValues = message.getValues()
         serializedValues.insert(0, messageID)

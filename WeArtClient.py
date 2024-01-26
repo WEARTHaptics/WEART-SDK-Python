@@ -8,7 +8,7 @@ import logging
 
 import WeArtCommon
 from WeArtCommon import TrackingType
-import WeArtMessage
+import pySDK.WeArtMessages as WeArtMessages
 from WeArtMessageSerializer import WeArtMessageSerializer
 from  WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 from WeArtMessageListener import WeArtMessageListener
@@ -40,13 +40,13 @@ class WeArtClient:
     def Start(self, tracking_type = TrackingType.WEART_HAND):
         start_msg = None
         if tracking_type != None:
-            start_msg = WeArtMessage.StartFromClientMessage(trackType=tracking_type)
+            start_msg = WeArtMessages.StartFromClientMessage(trackType=tracking_type)
         else:
-            start_msg = WeArtMessage.StartFromClientMessage()
+            start_msg = WeArtMessages.StartFromClientMessage()
         self.SendMessage(start_msg)
         
     def Stop(self):
-        stop_msg = WeArtMessage.StopFromClientMessage()
+        stop_msg = WeArtMessages.StopFromClientMessage()
         self.SendMessage(stop_msg)
     
     def Run(self):
@@ -79,7 +79,7 @@ class WeArtClient:
     def StopCalibration(self):
         return
     
-    def SendMessage(self, msg:WeArtMessage.WeArtMessage):
+    def SendMessage(self, msg:WeArtMessages.WeArtMessage):
         if not self.__Connected:
             return
         text = self._messageSerializer.Serialize(msg)
@@ -129,7 +129,7 @@ class WeArtClient:
             self.__ForwardingMessages(messages)
         return
     
-    def __ForwardingMessages(self, messages:list[WeArtMessage.WeArtMessage]):
+    def __ForwardingMessages(self, messages:list[WeArtMessages.WeArtMessage]):
         for msg in messages:
             if msg == None:
                 continue

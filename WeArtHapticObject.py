@@ -1,6 +1,6 @@
 from WeArtClient import WeArtClient
-from WeArtMessage import WeArtMessage, StopTemperatureMessage, StopForceMessage, StopTextureMessage
-from WeArtMessage import SetTemperatureMessage, SetForceMessage, SetTextureMessage
+from pySDK.WeArtMessages import WeArtMessage, StopTemperatureMessage, StopForceMessage, StopTextureMessage
+from pySDK.WeArtMessages import SetTemperatureMessage, SetForceMessage, SetTextureMessage
 from WeArtEffect import WeArtEffect
 from WeArtCommon import HandSide, ActuationPoint
 import WeArtCommon

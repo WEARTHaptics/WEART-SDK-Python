@@ -1,4 +1,4 @@
-import WeArtMessage
+import pySDK.WeArtMessages as WeArtMessages
 
 class WeArtMessageListener:
     def __init__(self, ids:list[str]):
@@ -9,5 +9,5 @@ class WeArtMessageListener:
             return True
         else:
             return False
-    def OnMessageReceived(message:WeArtMessage.WeArtMessage):
+    def OnMessageReceived(message:WeArtMessages.WeArtMessage):
         return
