@@ -1,4 +1,4 @@
-import pySDK.WeArtMessages as WeArtMessages
+import WeArtMessages as WeArtMessages
 
 class WeArtMessageSerializer:
     separator = ':'

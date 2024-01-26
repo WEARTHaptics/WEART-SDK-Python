@@ -8,7 +8,7 @@ import logging
 
 import WeArtCommon
 from WeArtCommon import TrackingType
-import pySDK.WeArtMessages as WeArtMessages
+import WeArtMessages as WeArtMessages
 from WeArtMessageSerializer import WeArtMessageSerializer
 from  WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 from WeArtMessageListener import WeArtMessageListener

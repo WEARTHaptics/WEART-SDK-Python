@@ -1,6 +1,6 @@
 from WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus
 import WeArtCommon
-from pySDK.WeArtCommon import HandSide
+from WeArtCommon import HandSide
 
 def StringToTrackingType(string:str):
 	if (string == "TrackType1"):

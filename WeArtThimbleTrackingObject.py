@@ -1,7 +1,6 @@
 from WeArtMessageListener import WeArtMessageListener
-from pySDK.WeArtMessages import WeArtMessage
 from WeArtCommon import HandSide, ActuationPoint
-from pySDK.WeArtMessages import WeArtMessage, TrackingMessage
+from WeArtMessages import WeArtMessage, TrackingMessage
 import WeArtCommon
 
 

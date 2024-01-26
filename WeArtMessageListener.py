@@ -1,4 +1,4 @@
-import pySDK.WeArtMessages as WeArtMessages
+import WeArtMessages as WeArtMessages
 
 class WeArtMessageListener:
     def __init__(self, ids:list[str]):
