@@ -9,13 +9,18 @@ class HandSide(IntFlag):
 	Left = 1 << 0
 	Right = 1 << 1
 
-
 class ActuationPoint(IntFlag):
 	#APnone	= 0
 	Thumb = 1 << 0
 	Index = 1 << 1
 	Middle = 1 << 2
 	Palm = 1 << 3
+
+class CalibrationStatus(IntFlag):
+	IDLE = 0
+	Calibrating = 1
+	Running = 2
+
 
 class TextureType(IntFlag):
 	ClickNormal = 0

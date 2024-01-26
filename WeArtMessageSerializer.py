@@ -30,7 +30,6 @@ class WeArtMessageSerializer:
         else: 
             return None
         '''   
-            case HashStringToInt(StartFromClientMessage::ID): return new StartFromClientMessage();
             case HashStringToInt(StopFromClientMessage::ID): return new StopFromClientMessage();
             case HashStringToInt(CalibrationResultMessage::ID): return new CalibrationResultMessage();
             case HashStringToInt(CalibrationStatusMessage::ID): return new CalibrationStatusMessage();

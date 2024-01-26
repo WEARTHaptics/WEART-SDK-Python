@@ -1,5 +1,6 @@
-from WeArtCommon import TrackingType, HandSide, ActuationPoint
+from WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus
 import WeArtCommon
+from pySDK.WeArtCommon import HandSide
 
 def StringToTrackingType(string:str):
 	if (string == "TrackType1"):
@@ -59,6 +60,18 @@ def ActuationPointToString(ap: ActuationPoint):
     else:
         assert(False)
         return ""
+    
+def CalibrationHandSideToString(hs: HandSide):
+    return "0" if hs == HandSide.Left else "1"
+    
+
+def StringToCalibrationHandSide(string: str):
+    if (string == "0"):
+        return HandSide.Left
+    elif (string == "1"):
+        return HandSide.Right
+    assert(False)
+    return HandSide.Left
 
 
 class WeArtMessage:
@@ -110,6 +123,20 @@ class WeArtMessageObjectSpecific(WeArtMessage):
         self._actuationPoint = actuation_point
 
 
+class WeArtMessageHandSpecific(WeArtMessage):
+    def __init__(self):
+        super().__init__()
+        self._handSide = None
+
+    def getHand(self):
+        return self._handSide
+
+    def setHandSide(self, handside: HandSide):
+        self._handSide = handside
+    
+    def setActuationPoint(self, actuation_point: ActuationPoint):
+        return
+
 
 class StartFromClientMessage(WeArtMessageNoParams):
     ID = "StartFromClient"
@@ -140,6 +167,59 @@ class StopFromClientMessage(WeArtMessageNoParams):
 
     def getID(self):
         return self.ID
+    
+
+
+class CalibrationStatusMessage(WeArtMessageHandSpecific):
+    ID = "CalibrationStatus"
+
+    def __init__(self):
+        super().__init__()
+        self._status = None
+
+    def getID(self):
+        return self.ID
+    
+    def getStatus(self):
+        return self._status
+    
+    def getValues(self):
+        ret = []
+        ret.append(CalibrationHandSideToString(self._handSide))
+        ret.append(str(int(self._status)))
+        return ret
+
+    def setValues(self, values:list[str]):
+        assert(len(values) == 2)
+        self._handSide = StringToCalibrationHandSide(values[0])
+        self._status = CalibrationStatus(int(values[1]))
+        print(self._status)
+
+
+
+class CalibrationResultMessage(WeArtMessageHandSpecific):
+    ID = "CalibrationResult"
+
+    def __init__(self):
+        super().__init__()
+        self._success = False
+
+    def getID(self):
+        return self.ID
+    
+    def getSuccess(self):
+        return self._success
+    
+    def getValues(self):
+        ret = []
+        ret.append(CalibrationHandSideToString(self._handSide))
+        ret.append("0" if self._success else "1")
+        return ret 
+
+    def setValues(self, values: list[str]):
+        assert(len(values) == 2)
+        self._handSide = StringToCalibrationHandSide(values[0])
+        self._success = int(values[1]) == 0
 
 
 class TrackingMessage(WeArtMessageNoParams):
