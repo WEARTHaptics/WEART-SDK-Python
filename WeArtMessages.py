@@ -169,6 +169,17 @@ class StopFromClientMessage(WeArtMessageNoParams):
         return self.ID
     
 
+class StartCalibrationMessage(WeArtMessageNoParams):
+	ID = "StartCalibration"
+
+	def getID(self): 
+		return self.ID
+
+class StopCalibrationMessage(WeArtMessageNoParams):
+	ID = "StopCalibration"
+
+	def getID(self): 
+		return self.ID
 
 class CalibrationStatusMessage(WeArtMessageHandSpecific):
     ID = "CalibrationStatus"

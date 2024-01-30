@@ -13,6 +13,9 @@ class WeArtTrackingCalibration(WeArtMessageListener):
     def getCurrentHand(self):
         return self.__currentHand
     
+    def getStatus(self):
+        return self.__status
+    
     def getResult(self):
         return self.__result
     
