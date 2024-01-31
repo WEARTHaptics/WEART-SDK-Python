@@ -204,7 +204,6 @@ class CalibrationStatusMessage(WeArtMessageHandSpecific):
         assert(len(values) == 2)
         self._handSide = StringToCalibrationHandSide(values[0])
         self._status = CalibrationStatus(int(values[1]))
-        print(self._status)
 
 
 

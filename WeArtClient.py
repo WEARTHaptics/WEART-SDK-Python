@@ -30,7 +30,7 @@ class WeArtClient:
         self.__IP_ADDESS = ip_address
         self.__PORT = port
         self.__logger = logging.getLogger("WeArtClient")
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(logging.INFO)
 
     class ErrorType(Enum):
         ConnectionError = 0
@@ -124,7 +124,7 @@ class WeArtClient:
         while True:
             data = self.__s.recv(4096)
             str_data = data.decode()
-            #self.__logger.debug(f"Received: { str_data }")
+            self.__logger.debug(f"Received: { str_data }")
             strings = str_data.split(WeArtClient.messagesSeparator)
             messages = []
             for string in strings:

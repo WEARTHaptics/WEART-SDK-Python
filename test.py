@@ -6,6 +6,7 @@ from WeArtForce import WeArtForce
 from WeArtCommon import TextureType
 from WeArtEffect import TouchEffect
 from WeArtTrackingCalibration import WeArtTrackingCalibration
+from WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 
 from WeArtClient import WeArtClient
 import WeArtCommon
@@ -20,23 +21,12 @@ if __name__ == '__main__':
     client.AddMessageListener(calibration)
     client.StartCalibration()
 
-    hand = calibration.getCurrentHand()
-    status = calibration.getStatus()
-    result = calibration.getResult()
-    print(hand, status, result)
+    while(not calibration.getResult()):
+        time.sleep(1)
     
-    # Be notified by callbacks when the calibration status changes
-    def prova(hand:HandSide, status:CalibrationStatus):
-        print(f"Aggiornamento sullo stato: {status}")
+    client.StopCalibration()
 
-    def prova2(hand:HandSide, result:bool):
-        print(f"Risultato pronto: {result}")
-
-    calibration.AddStatusCallback(prova)
     
-    # Be notified by callbacks when a calibration result is available
-    calibration.AddResultCallback(prova2)
-
     '''
     hapticObject = WeArtHapticObject(client)
     hapticObject.handSideFlag = HandSide.Right.value
@@ -58,12 +48,15 @@ if __name__ == '__main__':
     else:
         hapticObject.UpdateEffects()
     '''
-    time.sleep(10)
 
-    client.StopCalibration()
-    hand = calibration.getCurrentHand()
-    status = calibration.getStatus()
-    result = calibration.getResult()
-    print(hand, status, result)
+    thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Index)
+    client.AddThimbleTracking(thumbThimbleTracking)
+
+    for i in range(200):
+        closure = thumbThimbleTracking.GetClosure()
+        abduction = thumbThimbleTracking.GetAbduction()
+        print(f"{closure}, {abduction}")
+        time.sleep(0.1)
+
     
     client.Stop()

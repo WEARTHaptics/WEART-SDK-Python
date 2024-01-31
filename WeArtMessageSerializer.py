@@ -26,21 +26,30 @@ class WeArtMessageSerializer:
             return WeArtMessages.StartFromClientMessage()
         elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.TrackingMessage.ID)):
             return WeArtMessages.TrackingMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StopFromClientMessage.ID)):
+            return WeArtMessages.StopFromClientMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.CalibrationResultMessage.ID)):
+            return WeArtMessages.CalibrationResultMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.CalibrationStatusMessage.ID)):
+            return WeArtMessages.CalibrationStatusMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.SetTemperatureMessage.ID)):
+            return WeArtMessages.SetTemperatureMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StopTemperatureMessage.ID)):
+            return WeArtMessages.StopTemperatureMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.SetForceMessage.ID)):
+            return WeArtMessages.SetForceMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StopForceMessage.ID)):
+            return WeArtMessages.StopForceMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.SetTextureMessage.ID)):
+            return WeArtMessages.SetTextureMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StopTextureMessage.ID)):
+            return WeArtMessages.StopTextureMessage()
         #TODO Continues...
         else: 
             return None
         '''   
-            case HashStringToInt(StopFromClientMessage::ID): return new StopFromClientMessage();
-            case HashStringToInt(CalibrationResultMessage::ID): return new CalibrationResultMessage();
-            case HashStringToInt(CalibrationStatusMessage::ID): return new CalibrationStatusMessage();
             case HashStringToInt(ExitMessage::ID): return new ExitMessage();
             case HashStringToInt(DisconnectMessage::ID): return new DisconnectMessage();
-            case HashStringToInt(SetTemperatureMessage::ID): return new SetTemperatureMessage();
-            case HashStringToInt(StopTemperatureMessage::ID): return new StopTemperatureMessage();
-            case HashStringToInt(SetForceMessage::ID): return new SetForceMessage();
-            case HashStringToInt(StopForceMessage::ID): return new StopForceMessage();
-            case HashStringToInt(SetTextureMessage::ID): return new SetTextureMessage();
-            case HashStringToInt(StopTextureMessage::ID): return new StopTextureMessage();
         '''
 
     # @brief Serializes the given message to a string (ready to send on the network connection)
