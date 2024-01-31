@@ -292,10 +292,11 @@ class TrackingMessage(WeArtMessageNoParams):
             self.__LeftMiddleClosure = int(values[6])
             self.__LeftPalmClosure = int(values[7])
         elif self._trackingType == TrackingType.WEART_HAND:
-            self.__RightIndexClosure = int(values[0])
-            self.__RightThumbClosure = int(values[1])
-            self.__RightThumbAbduction = int(values[2])
-            self.__RightMiddleClosure = int(values[3])
+            assert(len(values)==9)
+            self.__RightIndexClosure = int(values[1])
+            self.__RightThumbClosure = int(values[2])
+            self.__RightThumbAbduction = int(values[3])
+            self.__RightMiddleClosure = int(values[4])
 
             self.__LeftIndexClosure = int(values[5])
             self.__LeftThumbClosure = int(values[6])
