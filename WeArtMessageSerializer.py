@@ -86,8 +86,7 @@ class WeArtMessageSerializer:
         strings = data.split(WeArtMessageSerializer.separator)
         messageID = strings[0]
         msg = WeArtMessageSerializer.createMessage(messageID)
-
-        if msg:
+        if msg != None:
             msg.setValues(strings[1:])
         
         return msg

@@ -24,7 +24,8 @@ if __name__ == '__main__':
     while(not calibration.getResult()):
         time.sleep(1)
     
-    client.StopCalibration()
+    print("Calibrazione finita")
+    #client.StopCalibration()
 
     
     '''
@@ -49,7 +50,7 @@ if __name__ == '__main__':
         hapticObject.UpdateEffects()
     '''
 
-    thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Index)
+    thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
     client.AddThimbleTracking(thumbThimbleTracking)
 
     for i in range(200):

@@ -279,7 +279,7 @@ class TrackingMessage(WeArtMessageNoParams):
             ret.append(str(self.__LeftMiddleClosure))
         return ret
     
-    def SetValues(self, values:list[str]):
+    def setValues(self, values:list[str]):
         self._trackingType = StringToTrackingType(values[0])
         if self._trackingType == TrackingType.DEFAULT:
             assert(len(values)==8)

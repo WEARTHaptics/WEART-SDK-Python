@@ -30,7 +30,7 @@ class WeArtClient:
         self.__IP_ADDESS = ip_address
         self.__PORT = port
         self.__logger = logging.getLogger("WeArtClient")
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(logging.INFO)
 
     class ErrorType(Enum):
         ConnectionError = 0
