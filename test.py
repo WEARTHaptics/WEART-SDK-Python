@@ -7,6 +7,8 @@ from WeArtCommon import TextureType
 from WeArtEffect import TouchEffect
 from WeArtTrackingCalibration import WeArtTrackingCalibration
 from WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
+from WeArtTrackingRawData import WeArtTrackingRawData
+from MiddlewareStatusListener import MiddlewareStatusListener
 
 from WeArtClient import WeArtClient
 import WeArtCommon
@@ -16,6 +18,11 @@ if __name__ == '__main__':
     client = WeArtClient(WeArtCommon.DEFAULT_IP_ADDRESS, WeArtCommon.DEFAULT_TCP_PORT)
     client.Run()
     client.Start()
+
+
+    mwListener = MiddlewareStatusListener()
+    client.AddMessageListener(mwListener)
+    
 
     calibration = WeArtTrackingCalibration()
     client.AddMessageListener(calibration)
@@ -50,14 +57,19 @@ if __name__ == '__main__':
         hapticObject.UpdateEffects()
     '''
 
-    thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
-    client.AddThimbleTracking(thumbThimbleTracking)
+    #thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
+    #client.AddThimbleTracking(thumbThimbleTracking)
 
-    for i in range(200):
+    """ for i in range(200):
         closure = thumbThimbleTracking.GetClosure()
         abduction = thumbThimbleTracking.GetAbduction()
         print(f"{closure}, {abduction}")
-        time.sleep(0.1)
+        time.sleep(0.1) """
+    trackingRawSensorData = WeArtTrackingRawData(HandSide.Right, ActuationPoint.Index)
+    client.AddMessageListener(trackingRawSensorData)
 
+    for i in range(5):
+        sample = trackingRawSensorData.GetLastSample()
+        print(sample)
     
     client.Stop()

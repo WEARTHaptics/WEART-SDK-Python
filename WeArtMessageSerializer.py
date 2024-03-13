@@ -1,4 +1,5 @@
 import WeArtMessages as WeArtMessages
+import json
 
 class WeArtMessageSerializer:
     separator = ':'
@@ -19,8 +20,7 @@ class WeArtMessageSerializer:
 	# @param ID Type of the message to create
 	# @return the created message
         
-    @staticmethod
-    def createMessage(id:str):
+    def __createMessage(self, id:str):
         h = WeArtMessageSerializer.HashStringToInt(id)
         if (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StartFromClientMessage.ID)):
             return WeArtMessages.StartFromClientMessage()
@@ -44,6 +44,18 @@ class WeArtMessageSerializer:
             return WeArtMessages.SetTextureMessage()
         elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.StopTextureMessage.ID)):
             return WeArtMessages.StopTextureMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.RawSensorsData.ID)):
+            return WeArtMessages.RawSensorsData()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.GetMiddlewareStatus.ID)):
+            return WeArtMessages.GetMiddlewareStatus()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.MiddlewareStatusMessage.ID)):
+            return WeArtMessages.MiddlewareStatusMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.GetDevicesStatusMessage.ID)):
+            return WeArtMessages.GetDevicesStatusMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.DevicesStatusMessage.ID)):
+            return WeArtMessages.DevicesStatusMessage()
+        elif (h == WeArtMessageSerializer.HashStringToInt(WeArtMessages.AnalogSensorsData.ID)):
+            return WeArtMessages.AnalogSensorsData()
         #TODO Continues...
         else: 
             return None
@@ -52,44 +64,21 @@ class WeArtMessageSerializer:
             case HashStringToInt(DisconnectMessage::ID): return new DisconnectMessage();
         '''
 
-    # @brief Serializes the given message to a string (ready to send on the network connection)
-	# @param message Message to serialize
-	# @return the serialized message as string
-	#std::string Serialize(WeArtMessage* message);
-    @staticmethod
-    def Serialize(message:WeArtMessages.WeArtMessage):
-        messageID = message.getID()
-        serializedValues = message.getValues()
-        serializedValues.insert(0, messageID)
-
-        res = serializedValues[0]
-        for i in range(1, len(serializedValues)):
-            res += WeArtMessageSerializer.separator
-            res += serializedValues[i]
-        
-        return res
-
-
-	# @brief Serializes a strirng into a bytestream
-	# @param text The string to serialize
-	# @return the serialized string
-	#uint8* Serialize(std::string text);
-
-    #TODO: maybe to be implemented
-
-	# @brief Deserializes a string into the corresponding message object
-	# @param data String containing the serialized message
-	# @return the message deserialized from the given string
-	#WeArtMessage* Deserialize(std::string data);
-    @staticmethod
-    def Deserialize(data:str):
-        strings = data.split(WeArtMessageSerializer.separator)
-        messageID = strings[0]
-        msg = WeArtMessageSerializer.createMessage(messageID)
+    def Deserialize(self, data: str) -> WeArtMessages.WeArtMessage:
+        id = self.__extractID(data)
+        msg = self.__createMessage(id)
         if msg != None:
-            msg.setValues(strings[1:])
-        
+            msg.deserialize(data)
         return msg
+
+    def __extractID(self, data:str) -> str:
+        try:
+            # if it is a JSON message
+            d = json.loads(data)
+            return d["type"]
+        except:
+            # if it is a CSV message
+            return data.split(":")[0]
 
 	# Bytestream to std::string.
 

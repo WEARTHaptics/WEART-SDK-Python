@@ -1,6 +1,8 @@
-from WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus
+from WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus, SensorData, AnalogSensorRawData, MiddlewareStatusData, ConnectedDeviceStatus
+from WeArtCommon import dataclass_from_dict, dict_from_dataclass
 import WeArtCommon
-from WeArtCommon import HandSide
+import json
+import time
 
 def StringToTrackingType(string:str):
 	if (string == "TrackType1"):
@@ -95,10 +97,76 @@ class WeArtMessage:
     def setActuationPoint(self, actuation_point:ActuationPoint):
         return
 
+class WeArtCsvMessage(WeArtMessage):
+    field_separator = ':'
+    def __init__(self):
+        super().__init__()
 
+    def getValues(self):
+        return super().getValues()
+    
+    def setValues(self):
+        return super().setValues()
+    
+    def serialize(self)->str:
+        messageID = self.getID()
+        serializedValues = self.getValues()
 
-class WeArtMessageNoParams(WeArtMessage):
-   
+        serializedValues.insert(0, messageID)
+
+        ss = serializedValues[0]
+        for i in range(1, len(serializedValues)):
+            ss += self.field_separator
+            ss += serializedValues[i]
+
+        return ss
+    
+    def deserialize(self, message:str)->None:
+        strings = message.split(":")
+        strings = strings[1:]
+        self.setValues(strings)
+        return 
+
+class WeArtJsonMessage(WeArtMessage):
+    def __init__(self):
+        super().__init__()
+        self._timestamp = int(time.time() * 1000)
+    
+    def timestamp(self):
+        return self._timestamp
+    
+    def serialize(self) -> str:
+        j = {}
+        j["type"] = self.getID()
+        j["ts"] = self._timestamp
+        payload = self._serializePayload()
+        if payload != None:
+            j["data"] = payload
+        
+        return json.dumps(j)
+    
+    def deserialize(self, message:str)->None:
+        j = json.loads(message)
+        self._timestamp = int(j["ts"])
+        if "data" in j:
+            self._deserializePayload(j["data"])
+    
+    def setHandSide(self, handside: HandSide)->None:
+        return 
+    
+    def setActuationPoint(self, actuation_point: ActuationPoint)->None:
+        return 
+
+    def _serializePayload():
+        return
+    
+    def _deserializePayload():
+        return
+    
+
+class WeArtMessageNoParams(WeArtCsvMessage):
+    def __init__(self):
+        super().__init__()
     # the message carries no value, so return empty list
     def getValues(self):
         return []
@@ -108,7 +176,7 @@ class WeArtMessageNoParams(WeArtMessage):
     
 
 
-class WeArtMessageObjectSpecific(WeArtMessage):
+class WeArtMessageObjectSpecific(WeArtCsvMessage):
     def __init__(self):
         self._handSide = None
         self._actuationPoint = None
@@ -123,7 +191,7 @@ class WeArtMessageObjectSpecific(WeArtMessage):
         self._actuationPoint = actuation_point
 
 
-class WeArtMessageHandSpecific(WeArtMessage):
+class WeArtMessageHandSpecific(WeArtCsvMessage):
     def __init__(self):
         super().__init__()
         self._handSide = None
@@ -485,6 +553,201 @@ class StopTextureMessage(WeArtMessageObjectSpecific):
         assert(len(values) == 2)
         self._handSide = StringToHandside(values[0])
         self._actuationPoint = StringToActuationPoint(values[1])
+
+
+class RawDataOn(WeArtJsonMessage):
+    ID = "RAW_DATA_ON"  
+    def __init__(self):
+        super().__init__()
+    
+    def getID(self):
+        return self.ID
+
+    def setHandSide(self, handside: HandSide) -> None:
+        return super().setHandSide(handside)
+    
+    def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
+        return super().setActuationPoint(actuation_point)
+
+
+class RawDataOff(WeArtJsonMessage):
+    ID = "RAW_DATA_OFF"  
+    def __init__(self):
+        super().__init__()
+    
+    def getID(self):
+        return self.ID
+
+    def setHandSide(self, handside: HandSide) -> None:
+        return super().setHandSide(handside)
+    
+    def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
+        return super().setActuationPoint(actuation_point)
+    
+class RawSensorsData(WeArtJsonMessage):
+    ID = "RAW_DATA"
+    def __init__(self):
+        super().__init__()
+        self._hand = None
+        self._sensors = {} #std::map<ActuationPoint, SensorData> sensors;
+
+    def getID(self):
+        return self.ID
+    
+    def setHandSide(self, handside: HandSide) -> None:
+        self._hand = handside
+
+    def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
+        return
+    
+    def getHand(self)->HandSide:
+        return self._hand
+    
+    def hasSensor(self, ap:ActuationPoint) -> bool:
+         return (ap in self._sensors)
+        
+    
+    def getSensor(self, ap:ActuationPoint) -> SensorData:
+       return self._sensors[ap]
+    
+    def _serializePayload(self):
+        j = {}
+        j["handSide"] = self._hand
+        for s in self._sensors:
+            actuationPoint = ActuationPointToString(s).lower()
+            j[actuationPoint] = dict_from_dataclass(self._sensors[s])
+        return j
+    
+    def _deserializePayload(self, payload):
+        hs = payload["handSide"]
+        self._hand = StringToHandside(hs)
+        if "index" in payload:
+            self._sensors[ActuationPoint.Index] = dataclass_from_dict(SensorData, payload["index"])
+        if "thumb" in payload:
+            self._sensors[ActuationPoint.Thumb] = dataclass_from_dict(SensorData, payload["thumb"])
+        if "middle" in payload:
+            self._sensors[ActuationPoint.Middle] = dataclass_from_dict(SensorData, payload["middle"])
+        if "palm" in payload:
+            self._sensors[ActuationPoint.Palm] = dataclass_from_dict(SensorData, payload["palm"])
+
+
+class AnalogSensorsData(WeArtJsonMessage):
+    ID = "RAW_SENSOR_ON_MASK"
+    def __init__(self):
+        super().__init__()
+        self._hand = None
+        self._sensors = {} #std::map<ActuationPoint, AnalogSensorRawData> sensors;
+    
+    def getID(self):
+        return self.ID
+    
+    def setHandSide(self, handside: HandSide) -> None:
+        self._hand = handside
+
+    def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
+        return
+
+    def getHand(self) -> HandSide:
+        return self._hand
+    
+    def hasSensor(self, ap:ActuationPoint) -> bool:
+        return
+    
+    def getSensor(self, ap:ActuationPoint) -> AnalogSensorRawData:
+        return
+    
+    def _serializePayload(self):
+        j = {}
+        j["handSide"] = self._hand
+        for s in self._sensors:
+            actuationPoint = ActuationPointToString(s).lower()
+            j[actuationPoint] = dict_from_dataclass(self._sensors[s])
+        return j
+    
+    def _deserializePayload(self, payload) -> None:
+        hs = payload["handSide"]
+        self._hand = StringToHandside(hs)
+        if "index" in payload:
+            self._sensors[ActuationPoint.Index] = dataclass_from_dict(AnalogSensorRawData, payload["index"])
+        if "thumb" in payload:
+            self._sensors[ActuationPoint.Thumb] = dataclass_from_dict(AnalogSensorRawData, payload["thumb"])
+        if "middle" in payload:
+            self._sensors[ActuationPoint.Middle] = dataclass_from_dict(AnalogSensorRawData, payload["middle"])
+        if "palm" in payload:
+            self._sensors[ActuationPoint.Palm] = dataclass_from_dict(AnalogSensorRawData, payload["palm"])
+
+class GetMiddlewareStatus(WeArtJsonMessage):
+
+    ID = "MW_GET_STATUS"
+    def __init__(self):
+        super().__init__()
+
+    def getID(self):
+        return self.ID
+    
+class MiddlewareStatusMessage(WeArtJsonMessage):
+    
+    ID = "MW_STATUS"
+
+    def __init__(self):
+        super().__init__()
+        self.__data = None #MiddlewareStatusData _data;
+
+    def getID(self) -> str:
+        return self.ID
+
+    def data(self) -> MiddlewareStatusData:
+        return self.__data
+    
+    def _serializePayload(self) -> dict:
+        return dict_from_dataclass(self.__data)
+    
+    def _deserializePayload(self, payload:dict) -> None:
+         self.__data = dataclass_from_dict(MiddlewareStatusData, payload)
+         self.__data.timestamp = self._timestamp
+        
+
+class GetDevicesStatusMessage(WeArtJsonMessage):
+
+    ID = "DEVICES_GET_STATUS"
+    def __init__(self):
+        super().__init__()
+    
+    def getID(self):
+        return self.ID
+    
+class DevicesStatusMessage(WeArtJsonMessage):
+    ID = "DEVICES_STATUS"
+
+    def __init__(self):
+        super().__init__()
+        self.__devices = [] #std::vector<ConnectedDeviceStatus> _devices;
+
+    def getID(self):
+        return self.ID
+    
+    def devices(self) -> list:
+        return self.__devices
+    
+    def _serializePayload(self) -> dict:
+        j = {}
+        j["devices"] = dict_from_dataclass(self.__devices)
+        return j
+    
+    def _deserializePayload(self, payload:dict) -> None:
+        if "devices" in payload:
+            self.__devices = dataclass_from_dict(ConnectedDeviceStatus, payload["devices"])
+
+
+
+
+
+
+
+
+    
+
+
   
 
 

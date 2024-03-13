@@ -12,6 +12,9 @@ import WeArtMessages as WeArtMessages
 from WeArtMessageSerializer import WeArtMessageSerializer
 from  WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 from WeArtMessageListener import WeArtMessageListener
+from WeArtTrackingRawData import WeArtTrackingRawData
+from WeArtAnalogSensorData import WeArtAnalogSensorData
+
 
 logging.basicConfig()
 
@@ -24,6 +27,7 @@ class WeArtClient:
         self.__s = None #socket
         self.__thimbleTrackingObjects = []
         self.__messageListeners = []
+        self.__messageCallbacks = []
         self.__connectionStatusCallbacks = []
         self.__errorCallbacks = []
         self.__pendingCallbacks = []
@@ -81,12 +85,23 @@ class WeArtClient:
     def StopCalibration(self):
         stopCalibration = WeArtMessages.StopCalibrationMessage()
         self.SendMessage(stopCalibration)
+
+    def StartRawData(self):
+        message = WeArtMessages.RawDataOn()
+        self.SendMessage(message)
+
+    def StopRawData(self):
+        message = WeArtMessages.RawDataOff()
+        self.SendMessage(message)
     
     def SendMessage(self, msg:WeArtMessages.WeArtMessage):
         if not self.__Connected:
             return
-        text = self._messageSerializer.Serialize(msg)
-        text += self.messagesSeparator
+        if msg == None:
+            return
+        
+        text = msg.serialize()
+        text+= self.messagesSeparator
 
         self.__logger.debug(f"Message to be sent: { text }")
 
@@ -103,16 +118,28 @@ class WeArtClient:
     def AddThimbleTracking(self, trackingObjects: WeArtThimbleTrackingObject):
         self.__thimbleTrackingObjects.append(trackingObjects)
         self.AddMessageListener(trackingObjects)
+
+    def AddThimbleRawSensors(self, rawSensorData: WeArtTrackingRawData):
+        return
     
+    def AddThimbleAnalogRawSensor(self, analogRawSensorData: WeArtAnalogSensorData):
+        return
+        
     def SizeThimbles(self):
         return len(self.__thimbleTrackingObjects)
     
     def AddMessageListener(self, listener: WeArtMessageListener):
         self.__messageListeners.append(listener)
 
+    def AddMessageCallback(self, callback):
+        return
+
     def RemoveMessageListener(self, listener: WeArtMessageListener):
         if listener in self.__messageListeners:
             self.__messageListeners.remove(listener)
+
+    def RemoveMessageCallback(self, callback):
+        return
 
     def AddConnectionStatusCallback(self, callback):
         self.__connectionStatusCallbacks.append(callback)

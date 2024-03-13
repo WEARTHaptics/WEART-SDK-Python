@@ -1,4 +1,6 @@
 from enum import IntFlag
+from dataclasses import dataclass
+import dataclasses
 
 class TrackingType(IntFlag):
     DEFAULT = 0
@@ -8,6 +10,15 @@ class HandSide(IntFlag):
 	#HSnone = 0	
 	Left = 1 << 0
 	Right = 1 << 1
+
+class HandClosingState(IntFlag):
+	Open = 0
+	Closing = 1
+	Closed = 2
+
+class GraspingState(IntFlag):
+	Grapped = 0
+	Released = 1
 
 class ActuationPoint(IntFlag):
 	#APnone	= 0
@@ -21,6 +32,17 @@ class CalibrationStatus(IntFlag):
 	Calibrating = 1
 	Running = 2
 
+class MiddlewareStatus(IntFlag):
+	DISCONNECTED=0
+	IDLE = 1
+	STARTING = 2
+	RUNNING = 3
+	STOPPING = 4
+	UPLOADING_TEXTURES = 5
+	CONNECTING_DEVICE = 6
+	CALIBRATION = 7
+	def __str__(self):
+		return self.name
 
 class TextureType(IntFlag):
 	ClickNormal = 0
@@ -46,6 +68,76 @@ class TextureType(IntFlag):
 	Aluminium = 20
 	DoubleSidedTape = 21
 
+@dataclass
+class AccelerometerData:
+	x: float = 0.0
+	y: float = 0.0
+	z: float = 0.0
+
+
+@dataclass
+class GyroscopeData:
+	x: float = 0.0
+	y: float = 0.0
+	z: float = 0.0
+
+@dataclass
+class TofData:
+	distance: int = 0
+
+@dataclass
+class SensorData:
+	accelerometer: AccelerometerData
+	gyroscope: GyroscopeData
+	timeOfFlight: TofData
+
+@dataclass
+class AnalogSensorRawData:
+	ntcTemperatureRaw:float
+	ntcTemperatureConverted:float
+	forceSensingRaw:float
+	forceSensingConverted:float
+
+@dataclass
+class MiddlewareConnectedDevice:
+	macAddress:str
+	handSide:HandSide
+
+@dataclass
+class MiddlewareStatusData:
+	timestamp:int
+	status:MiddlewareStatus
+	statusCode:int
+	errorDesc:str
+	actuationsEnabled:bool
+	connectedDevices:list #std::vector<MiddlewareConnectedDevice>
+
+@dataclass
+class ThimbleStatus:
+	id:ActuationPoint
+	connected:bool
+	statusCode:int
+	errorDesc:str
+
+@dataclass
+class ConnectedDeviceStatus:
+	macAddress:str
+	handSide: HandSide
+	batteryLevel: int
+	charging: bool
+	thimbles: list #std::vector<ThimbleStatus> thimbles;
+
+
+def dataclass_from_dict(klass, d):
+    try:
+        fieldtypes = {f.name:f.type for f in dataclasses.fields(klass)}
+        return klass(**{f:dataclass_from_dict(fieldtypes[f],d[f]) for f in d})
+    except:
+        return d # Not a dataclass field
+
+def dict_from_dataclass(k):
+	if dataclasses.is_dataclass(k):
+		return dataclasses.asdict(k)
 
 
 DEFAULT_IP_ADDRESS = "127.0.0.1"
