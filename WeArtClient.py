@@ -64,8 +64,8 @@ class WeArtClient:
             t = Thread(target=self._OnReceive, args = [], daemon=True)
             t.start()
 
-            getStatusMessage = WeArtMessages.GetMiddlewareStatus()
-            self.SendMessage(getStatusMessage)
+            #getStatusMessage = WeArtMessages.GetMiddlewareStatus()
+            #self.SendMessage(getStatusMessage)
 
             getDevicesMessage = WeArtMessages.GetDevicesStatusMessage()
             self.SendMessage(getDevicesMessage)

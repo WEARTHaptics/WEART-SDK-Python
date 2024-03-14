@@ -1,6 +1,9 @@
 from enum import IntFlag
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import dataclasses
+from typing import List
+import logging
+import json
 
 class TrackingType(IntFlag):
     DEFAULT = 0
@@ -10,6 +13,7 @@ class HandSide(IntFlag):
 	#HSnone = 0	
 	Left = 1 << 0
 	Right = 1 << 1
+	
 
 class HandClosingState(IntFlag):
 	Open = 0
@@ -26,6 +30,7 @@ class ActuationPoint(IntFlag):
 	Index = 1 << 1
 	Middle = 1 << 2
 	Palm = 1 << 3
+
 
 class CalibrationStatus(IntFlag):
 	IDLE = 0
@@ -105,39 +110,62 @@ class MiddlewareConnectedDevice:
 
 @dataclass
 class MiddlewareStatusData:
-	timestamp:int
 	status:MiddlewareStatus
+	version:str
 	statusCode:int
 	errorDesc:str
 	actuationsEnabled:bool
 	connectedDevices:list #std::vector<MiddlewareConnectedDevice>
+	timestamp:int = 0
 
 @dataclass
 class ThimbleStatus:
-	id:ActuationPoint
-	connected:bool
-	statusCode:int
-	errorDesc:str
+	id:ActuationPoint = ActuationPoint.Palm
+	connected:bool = False
+	statusCode:int = 0
+	errorDesc:str = ""
 
 @dataclass
 class ConnectedDeviceStatus:
-	macAddress:str
-	handSide: HandSide
-	batteryLevel: int
-	charging: bool
-	thimbles: list #std::vector<ThimbleStatus> thimbles;
+	macAddress:str = ""
+	handSide: HandSide = HandSide.Left
+	batteryLevel: int = 0
+	charging: bool = False
+	thimbles: List[ThimbleStatus] = field(default_factory=lambda: [ThimbleStatus()]) #std::vector<ThimbleStatus> thimbles;
 
+
+def dataclass_from_list(klass, l):
+	ret = []
+	for elem in l:
+		ret.append(dataclass_from_dict(klass, elem))
+	return ret
 
 def dataclass_from_dict(klass, d):
-    try:
-        fieldtypes = {f.name:f.type for f in dataclasses.fields(klass)}
-        return klass(**{f:dataclass_from_dict(fieldtypes[f],d[f]) for f in d})
-    except:
-        return d # Not a dataclass field
+	if dataclasses.is_dataclass(klass):
+		fieldtypes = {f.name:f.type for f in dataclasses.fields(klass)}
+		k = klass(**{f:dataclass_from_dict(fieldtypes[f],d[f]) for f in d})
+		return k
+	else:
+		if klass == MiddlewareStatus:
+			return MiddlewareStatus[d]
+		if klass == ActuationPoint:
+			return ActuationPoint[str(d).capitalize()]
+		if klass == HandSide:
+			return HandSide[str(d).capitalize()]
+		if klass == List[ThimbleStatus]:
+			return dataclass_from_list(ThimbleStatus, d)
+		return d # Not a dataclass field
 
 def dict_from_dataclass(k):
+	#to be checked, IntFlags are not well represented
 	if dataclasses.is_dataclass(k):
-		return dataclasses.asdict(k)
+		return  dataclasses.asdict(k)
+	elif isinstance(k, list):
+		l = []
+		for elem in k:
+			l.append(dict_from_dataclass(elem))
+		return l
+
 
 
 DEFAULT_IP_ADDRESS = "127.0.0.1"

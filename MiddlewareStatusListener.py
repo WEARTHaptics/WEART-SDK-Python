@@ -27,21 +27,22 @@ class MiddlewareStatusListener(WeArtMessageListener):
         toUpdate = False
         if message.getID() == MiddlewareStatusMessage.ID:
             mwStatus = message
-            if mwStatus != None:
-                newStatus = mwStatus.data()
-                self.__data.timestamp = mwStatus.timestamp()
-                self.__data.status = newStatus["status"]
-                self.__data.version = newStatus["version"]
-                self.__data.statusCode = newStatus["statusCode"]
-                self.__data.errorDesc = newStatus["errorDesc"]
-                self.__data.actuationsEnabled = newStatus["actuationsEnabled"]
-                toUpdate = True
+            newStatus = mwStatus.data()
+            self.__data.timestamp = mwStatus.timestamp()
+            self.__data.status = newStatus.status
+            self.__data.version = newStatus.version
+            self.__data.statusCode = newStatus.statusCode
+            self.__data.errorDesc = newStatus.errorDesc
+            self.__data.actuationsEnabled = newStatus.actuationsEnabled
+            self.__logger.debug(self.__data)
+            toUpdate = True
 
         elif message.getID() == DevicesStatusMessage.ID:
             deviceStatus = message
             if deviceStatus!= None:
                 self.__data.timestamp = deviceStatus.timestamp()
                 self.__data.devices = deviceStatus.devices()
+                self.__logger.debug(self.__data)
                 toUpdate = True
 
         if toUpdate:

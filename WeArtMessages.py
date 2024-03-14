@@ -1,5 +1,5 @@
 from WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus, SensorData, AnalogSensorRawData, MiddlewareStatusData, ConnectedDeviceStatus
-from WeArtCommon import dataclass_from_dict, dict_from_dataclass
+from WeArtCommon import dataclass_from_dict, dict_from_dataclass, dataclass_from_list
 import WeArtCommon
 import json
 import time
@@ -705,7 +705,10 @@ class MiddlewareStatusMessage(WeArtJsonMessage):
     
     def _deserializePayload(self, payload:dict) -> None:
         self.__data = dataclass_from_dict(MiddlewareStatusData, payload)
-        self.__data.timestamp = self._timestamp
+        try:
+            self.__data.timestamp = self._timestamp
+        except:
+            pass
         
 
 class GetDevicesStatusMessage(WeArtJsonMessage):
@@ -737,7 +740,7 @@ class DevicesStatusMessage(WeArtJsonMessage):
     
     def _deserializePayload(self, payload:dict) -> None:
         if "devices" in payload:
-            self.__devices = dataclass_from_dict(ConnectedDeviceStatus, payload["devices"])
+            self.__devices = dataclass_from_list(ConnectedDeviceStatus, payload["devices"])
 
 
 
