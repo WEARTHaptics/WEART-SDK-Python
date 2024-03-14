@@ -34,7 +34,7 @@ class WeArtClient:
         self.__IP_ADDESS = ip_address
         self.__PORT = port
         self.__logger = logging.getLogger("WeArtClient")
-        self.__logger.setLevel(logging.INFO)
+        self.__logger.setLevel(logging.DEBUG)
 
     class ErrorType(Enum):
         ConnectionError = 0
@@ -63,6 +63,13 @@ class WeArtClient:
             self.__NotifyConnectionStatus(True)
             t = Thread(target=self._OnReceive, args = [], daemon=True)
             t.start()
+
+            getStatusMessage = WeArtMessages.GetMiddlewareStatus()
+            self.SendMessage(getStatusMessage)
+
+            getDevicesMessage = WeArtMessages.GetDevicesStatusMessage()
+            self.SendMessage(getDevicesMessage)
+
         except socket.error as e:
             self.__logger.error(f"Unable to connect to server { server_addr }... \n{e}")
             self.__Connected = False

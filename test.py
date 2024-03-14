@@ -9,6 +9,7 @@ from WeArtTrackingCalibration import WeArtTrackingCalibration
 from WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 from WeArtTrackingRawData import WeArtTrackingRawData
 from MiddlewareStatusListener import MiddlewareStatusListener
+from WeArtAnalogSensorData import WeArtAnalogSensorData
 
 from WeArtClient import WeArtClient
 import WeArtCommon
@@ -22,7 +23,6 @@ if __name__ == '__main__':
 
     mwListener = MiddlewareStatusListener()
     client.AddMessageListener(mwListener)
-    
 
     calibration = WeArtTrackingCalibration()
     client.AddMessageListener(calibration)
@@ -57,19 +57,28 @@ if __name__ == '__main__':
         hapticObject.UpdateEffects()
     '''
 
-    #thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
-    #client.AddThimbleTracking(thumbThimbleTracking)
+    """thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
+    client.AddThimbleTracking(thumbThimbleTracking)
 
-    """ for i in range(200):
+    for i in range(200):
         closure = thumbThimbleTracking.GetClosure()
         abduction = thumbThimbleTracking.GetAbduction()
         print(f"{closure}, {abduction}")
         time.sleep(0.1) """
-    trackingRawSensorData = WeArtTrackingRawData(HandSide.Right, ActuationPoint.Index)
-    client.AddMessageListener(trackingRawSensorData)
 
-    for i in range(5):
-        sample = trackingRawSensorData.GetLastSample()
-        print(sample)
+    """ trackingRawSensorData = WeArtTrackingRawData(HandSide.Right, ActuationPoint.Index)
+    client.AddMessageListener(trackingRawSensorData)
+    client.StartRawData()
+
+    ts = trackingRawSensorData.GetLastSample().timestamp
+    while ts == 0:
+        time.sleep(1)
+        ts = trackingRawSensorData.GetLastSample().timestamp
+    sample = trackingRawSensorData.GetLastSample()
+    print(sample)
+    client.StopRawData() """
+
+    analogSensorData = WeArtAnalogSensorData(HandSide.Right, ActuationPoint.Index)
+    client.AddMessageListener(analogSensorData)
     
     client.Stop()

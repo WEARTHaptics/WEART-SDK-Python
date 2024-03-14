@@ -3,6 +3,7 @@ from WeArtCommon import dataclass_from_dict, dict_from_dataclass
 import WeArtCommon
 import json
 import time
+import logging
 
 def StringToTrackingType(string:str):
 	if (string == "TrackType1"):
@@ -157,10 +158,10 @@ class WeArtJsonMessage(WeArtMessage):
     def setActuationPoint(self, actuation_point: ActuationPoint)->None:
         return 
 
-    def _serializePayload():
+    def _serializePayload(self):
         return
     
-    def _deserializePayload():
+    def _deserializePayload(self):
         return
     
 
@@ -703,8 +704,8 @@ class MiddlewareStatusMessage(WeArtJsonMessage):
         return dict_from_dataclass(self.__data)
     
     def _deserializePayload(self, payload:dict) -> None:
-         self.__data = dataclass_from_dict(MiddlewareStatusData, payload)
-         self.__data.timestamp = self._timestamp
+        self.__data = dataclass_from_dict(MiddlewareStatusData, payload)
+        self.__data.timestamp = self._timestamp
         
 
 class GetDevicesStatusMessage(WeArtJsonMessage):

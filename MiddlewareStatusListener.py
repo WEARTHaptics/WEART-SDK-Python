@@ -1,24 +1,27 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 from WeArtCommon import MiddlewareStatus, ConnectedDeviceStatus
 from WeArtMessageListener import WeArtMessageListener
 from WeArtMessages import MiddlewareStatusMessage, DevicesStatusMessage
-from pySDK.WeArtMessages import WeArtMessage
+from WeArtMessages import WeArtMessage
+import logging
 
 @dataclass 
 class MiddlewareStatusUpdate:
-    timestamp: int
-    status: MiddlewareStatus
-    version: str
-    statusCode: int
-    errorDesc: str
-    actuationsEnabled:bool
-    devices: list[ConnectedDeviceStatus]
+    timestamp: int = 0
+    status: MiddlewareStatus = MiddlewareStatus(0)
+    version: str = ""
+    statusCode: int = 0
+    errorDesc: str = ""
+    actuationsEnabled:bool = False
+    devices: List = field(default_factory=lambda: [])
 
 class MiddlewareStatusListener(WeArtMessageListener):
     def __init__(self):
-        super().__init__(MiddlewareStatusMessage.ID, DevicesStatusMessage.ID)
+        super().__init__([MiddlewareStatusMessage.ID, DevicesStatusMessage.ID])
         self.__statusCallbacks = []
         self.__data = MiddlewareStatusUpdate()
+        self.__logger = logging.getLogger("WeArtClient")
     
     def OnMessageReceived(self, message: WeArtMessage):
         toUpdate = False
@@ -27,13 +30,13 @@ class MiddlewareStatusListener(WeArtMessageListener):
             if mwStatus != None:
                 newStatus = mwStatus.data()
                 self.__data.timestamp = mwStatus.timestamp()
-                self.__data.status = newStatus.status
-                self.__data.version = newStatus.version
-                self.__data.statusCode = newStatus.statusCode
-                self.__data.errorDesc = newStatus.errorDesc
-                self.__data.actuationsEnabled = newStatus.actuationsEnabled
+                self.__data.status = newStatus["status"]
+                self.__data.version = newStatus["version"]
+                self.__data.statusCode = newStatus["statusCode"]
+                self.__data.errorDesc = newStatus["errorDesc"]
+                self.__data.actuationsEnabled = newStatus["actuationsEnabled"]
                 toUpdate = True
-                
+
         elif message.getID() == DevicesStatusMessage.ID:
             deviceStatus = message
             if deviceStatus!= None:
