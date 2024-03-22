@@ -652,10 +652,10 @@ class AnalogSensorsData(WeArtJsonMessage):
         return self._hand
     
     def hasSensor(self, ap:ActuationPoint) -> bool:
-        return
+        return ap in self._sensors
     
     def getSensor(self, ap:ActuationPoint) -> AnalogSensorRawData:
-        return
+        return self._sensors[ap]
     
     def _serializePayload(self):
         j = {}

@@ -6,14 +6,14 @@ from dataclasses import dataclass
 
 @dataclass
 class Sample:
-    timestamp: int
-    data: AnalogSensorRawData
+    timestamp: int = 0
+    data: AnalogSensorRawData = None
 
 class WeArtAnalogSensorData(WeArtMessageListener):
 
     def __init__(self, handSide:HandSide, actuationPoint:ActuationPoint):
         super().__init__([AnalogSensorsData.ID])
-        self.__lastSample = None #Sample lastSample;
+        self.__lastSample = Sample()
         self.__callbacks = [] #std::vector<std::function<void(Sample)>> callbacks;
         self.__handSide = handSide
         self.__actuationPoint = actuationPoint
@@ -36,7 +36,7 @@ class WeArtAnalogSensorData(WeArtMessageListener):
         if not rawSensorsData.hasSensor(self.__actuationPoint):
             return
         
-        sample = Sample(timestamp = rawSensorsData.timestamp(), data = rawSensorsData.getSensors(self.__actuationPoint))
-        self.__lasample = sample
+        sample = Sample(timestamp = rawSensorsData.timestamp(), data = rawSensorsData.getSensor(self.__actuationPoint))
+        self.__lastSample = sample
         for callback in self.__callbacks:
             callback(sample)

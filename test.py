@@ -24,15 +24,15 @@ if __name__ == '__main__':
     mwListener = MiddlewareStatusListener()
     client.AddMessageListener(mwListener)
 
-    #calibration = WeArtTrackingCalibration()
-    #client.AddMessageListener(calibration)
-    #client.StartCalibration()
+    calibration = WeArtTrackingCalibration()
+    client.AddMessageListener(calibration)
+    client.StartCalibration()
 
-    #while(not calibration.getResult()):
-    #    time.sleep(1)
+    while(not calibration.getResult()):
+        time.sleep(1)
     
-    #print("Calibrazione finita")
-    #client.StopCalibration()
+    print("Calibrazione finita")
+    client.StopCalibration()
 
     
     '''
@@ -77,8 +77,15 @@ if __name__ == '__main__':
     sample = trackingRawSensorData.GetLastSample()
     print(sample)
     client.StopRawData() """
-    time.sleep(1)
-    #analogSensorData = WeArtAnalogSensorData(HandSide.Right, ActuationPoint.Index)
-    #client.AddMessageListener(analogSensorData)
+    #time.sleep(1)
+    analogSensorData = WeArtAnalogSensorData(HandSide.Right, ActuationPoint.Index)
+    client.AddMessageListener(analogSensorData)
+
+    ts = analogSensorData.GetLastSample().timestamp
+    while ts == 0:
+        time.sleep(1)
+        ts = analogSensorData.GetLastSample().timestamp
+    sample = analogSensorData.GetLastSample()
+    print(sample)
     
     client.Stop()
