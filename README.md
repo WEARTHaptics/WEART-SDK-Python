@@ -56,14 +56,14 @@ To start the middleware operations, call the Start() method.
 
 ~~~~~~~~~~~~~{.py}
 client = WeArtClient(WeArtCommon.DEFAULT_IP_ADDRESS, WeArtCommon.DEFAULT_TCP_PORT)
-    client.Run()
-    client.Start()
+client.Run()
+client.Start()
 ~~~~~~~~~~~~~
 
 To stop the middleware, call the Stop() method.
 
 ~~~~~~~~~~~~~{.py}
-	clint.Stop();
+client.Stop();
 ~~~~~~~~~~~~~
 
 ## Devices calibration
@@ -75,9 +75,9 @@ from the middleware, and get notified when the calibration process ends.
 
 ~~~~~~~~~~~~~{.py}
 calibration = WeArtTrackingCalibration()
-    client.AddMessageListener(calibration)
-    # Start Calibration Finger tracking algorithm
-    client.StartCalibration()
+client.AddMessageListener(calibration)
+# Start Calibration Finger tracking algorithm
+client.StartCalibration()
 ~~~~~~~~~~~~~
 
 Then, start the calibration procedure. This will allow the middleware to calibrate the hand sensor offsets based on the current setup (thimbles and control device position, hand inclination, personal differences in the fingers etc..).
@@ -110,8 +110,8 @@ To create one, use the following code:
 
 ~~~~~~~~~~~~~{.cpp}
 hapticObject = WeArtHapticObject(client)
-    hapticObject.handSideFlag = HandSide.Right.value
-    hapticObject.actuationPointFlag = ActuationPoint.Index | ActuationPoint.Middle
+hapticObject.handSideFlag = HandSide.Right.value
+hapticObject.actuationPointFlag = ActuationPoint.Index | ActuationPoint.Middle
 ~~~~~~~~~~~~~
 
 
@@ -176,7 +176,7 @@ related to the TouchDIVER thimbles.
 To read these values, create and set a thimble tracker object for monitoring the closure/abduction value of a given finger:
 ~~~~~~~~~~~~~{.py}
 thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
-    client.AddThimbleTracking(thumbThimbleTracking)
+client.AddThimbleTracking(thumbThimbleTracking)
 ~~~~~~~~~~~~~
 
 Once this object is added to the client, it will start receiving the tracking values.
