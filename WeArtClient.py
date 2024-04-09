@@ -77,6 +77,9 @@ class WeArtClient:
             sys.exit()
         return
     
+    def Pause(self):
+        print("pause client")
+
     def IsConnected(self):
         return self.__Connected
     
