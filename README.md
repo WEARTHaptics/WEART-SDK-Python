@@ -8,7 +8,7 @@ The Weart Low-Level Python SDK  allows to connect to the WEART Middleware (dekst
 * Receive analog raw data from the thimble's senosrs
 * Send haptic effects to the devices
 
-## Documentaions, SDKs and other resources
+## Documentations, SDKs and other resources
 WEART Download page [here](https://weart.it/developer-guide/)
 
 # Acknowledgements
