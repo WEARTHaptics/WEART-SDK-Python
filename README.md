@@ -162,7 +162,7 @@ else:
 
 ### Remove Effect
 
-If an effect is not needed anymore, it can be removed from the haptic object with the WeArtHapticObject::RemoveEffect method.
+If an effect is not needed anymore, it can be removed from the haptic object with the *RemoveEffect* method.
 
 ~~~~~~~~~~~~~{.py}
 hapticObject.RemoveEffect(touchEffect)
