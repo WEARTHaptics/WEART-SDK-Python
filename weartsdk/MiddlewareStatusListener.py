@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from typing import List
-from WeArtCommon import MiddlewareStatus, ConnectedDeviceStatus
-from WeArtMessageListener import WeArtMessageListener
-from WeArtMessages import MiddlewareStatusMessage, DevicesStatusMessage
-from WeArtMessages import WeArtMessage
+from .WeArtCommon import MiddlewareStatus, ConnectedDeviceStatus
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtMessages import MiddlewareStatusMessage, DevicesStatusMessage
+from .WeArtMessages import WeArtMessage
 import logging
 
 @dataclass 
@@ -55,6 +55,4 @@ class MiddlewareStatusListener(WeArtMessageListener):
     
     def lastStatus(self) -> MiddlewareStatusUpdate:
         return self.__data
-
-    
 

@@ -1,4 +1,4 @@
-from WeArtCommon import TextureType
+from .WeArtCommon import TextureType
 
 class WeArtTexture:
     DefaultTextureType = TextureType.ClickNormal

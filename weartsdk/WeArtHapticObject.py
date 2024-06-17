@@ -1,12 +1,12 @@
-from WeArtClient import WeArtClient
-from WeArtMessages import WeArtMessage, StopTemperatureMessage, StopForceMessage, StopTextureMessage
-from WeArtMessages import SetTemperatureMessage, SetForceMessage, SetTextureMessage
-from WeArtEffect import WeArtEffect
-from WeArtCommon import HandSide, ActuationPoint
-import WeArtCommon
-from WeArtForce import WeArtForce
-from WeArtTemperature import WeArtTemperature
-from WeArtTexture import WeArtTexture
+from .WeArtClient import WeArtClient
+from .WeArtMessages import WeArtMessage, StopTemperatureMessage, StopForceMessage, StopTextureMessage
+from .WeArtMessages import SetTemperatureMessage, SetForceMessage, SetTextureMessage
+from .WeArtEffect import WeArtEffect
+from .WeArtCommon import HandSide, ActuationPoint
+from . import WeArtCommon
+from .WeArtForce import WeArtForce
+from .WeArtTemperature import WeArtTemperature
+from .WeArtTexture import WeArtTexture
 
 class WeArtHapticObject:
     def __init__(self, client:WeArtClient):

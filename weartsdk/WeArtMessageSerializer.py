@@ -1,4 +1,4 @@
-import WeArtMessages as WeArtMessages
+from . import WeArtMessages as WeArtMessages
 import json
 
 class WeArtMessageSerializer:

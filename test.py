@@ -1,18 +1,18 @@
-from WeArtHapticObject import WeArtHapticObject
-from WeArtCommon import HandSide, ActuationPoint, CalibrationStatus
-from WeArtTemperature import WeArtTemperature
-from WeArtTexture import WeArtTexture
-from WeArtForce import WeArtForce
-from WeArtCommon import TextureType
-from WeArtEffect import TouchEffect
-from WeArtTrackingCalibration import WeArtTrackingCalibration
-from WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
-from WeArtTrackingRawData import WeArtTrackingRawData
-from MiddlewareStatusListener import MiddlewareStatusListener
-from WeArtAnalogSensorData import WeArtAnalogSensorData
+from weartsdk.WeArtHapticObject import WeArtHapticObject
+from weartsdk.WeArtCommon import HandSide, ActuationPoint, CalibrationStatus
+from weartsdk.WeArtTemperature import WeArtTemperature
+from weartsdk.WeArtTexture import WeArtTexture
+from weartsdk.WeArtForce import WeArtForce
+from weartsdk.WeArtCommon import TextureType
+from weartsdk.WeArtEffect import TouchEffect
+from weartsdk.WeArtTrackingCalibration import WeArtTrackingCalibration
+from weartsdk.WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
+from weartsdk.WeArtTrackingRawData import WeArtTrackingRawData
+from weartsdk.MiddlewareStatusListener import MiddlewareStatusListener
+from weartsdk.WeArtAnalogSensorData import WeArtAnalogSensorData
 
-from WeArtClient import WeArtClient
-import WeArtCommon
+from weartsdk.WeArtClient import WeArtClient
+import weartsdk.WeArtCommon
 import time
 
 '''
@@ -22,7 +22,7 @@ Sample demo script to show the functionallity of the WEART Python SDK
 if __name__ == '__main__':
     
     # Istantiate TCP/IP client to communicate with the Middleware
-    client = WeArtClient(WeArtCommon.DEFAULT_IP_ADDRESS, WeArtCommon.DEFAULT_TCP_PORT)
+    client = WeArtClient(weartsdk.WeArtCommon.DEFAULT_IP_ADDRESS, weartsdk.WeArtCommon.DEFAULT_TCP_PORT)
     client.Run()
     client.Start()
 

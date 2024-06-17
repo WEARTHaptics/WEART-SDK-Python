@@ -1,5 +1,5 @@
-from WeArtMessageListener import WeArtMessageListener
-from WeArtMessages import CalibrationResultMessage, CalibrationStatusMessage, WeArtMessage
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtMessages import CalibrationResultMessage, CalibrationStatusMessage, WeArtMessage
 
 class WeArtTrackingCalibration(WeArtMessageListener):
     def __init__(self):

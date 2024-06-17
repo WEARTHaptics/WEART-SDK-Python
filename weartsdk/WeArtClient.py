@@ -6,14 +6,14 @@ from threading import Thread
 from enum import Enum
 import logging
 
-import WeArtCommon
-from WeArtCommon import TrackingType
-import WeArtMessages as WeArtMessages
-from WeArtMessageSerializer import WeArtMessageSerializer
-from  WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
-from WeArtMessageListener import WeArtMessageListener
-from WeArtTrackingRawData import WeArtTrackingRawData
-from WeArtAnalogSensorData import WeArtAnalogSensorData
+from . import WeArtCommon
+from .WeArtCommon import TrackingType
+from . import WeArtMessages as WeArtMessages
+from .WeArtMessageSerializer import WeArtMessageSerializer
+from  .WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtTrackingRawData import WeArtTrackingRawData
+from .WeArtAnalogSensorData import WeArtAnalogSensorData
 
 
 logging.basicConfig()

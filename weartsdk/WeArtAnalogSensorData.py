@@ -1,6 +1,6 @@
-from WeArtMessageListener import WeArtMessageListener
-from WeArtCommon import HandSide, ActuationPoint, AnalogSensorRawData
-from WeArtMessages import WeArtMessage, AnalogSensorsData
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtCommon import HandSide, ActuationPoint, AnalogSensorRawData
+from .WeArtMessages import WeArtMessage, AnalogSensorsData
 from dataclasses import dataclass
 
 

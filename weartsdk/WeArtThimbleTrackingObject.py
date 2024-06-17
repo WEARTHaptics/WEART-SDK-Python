@@ -1,7 +1,7 @@
-from WeArtMessageListener import WeArtMessageListener
-from WeArtCommon import HandSide, ActuationPoint
-from WeArtMessages import WeArtMessage, TrackingMessage
-import WeArtCommon
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtCommon import HandSide, ActuationPoint
+from .WeArtMessages import WeArtMessage, TrackingMessage
+from . import WeArtCommon
 
 
 class WeArtThimbleTrackingObject(WeArtMessageListener):

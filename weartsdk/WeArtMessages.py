@@ -1,6 +1,6 @@
-from WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus, SensorData, AnalogSensorRawData, MiddlewareStatusData, ConnectedDeviceStatus
-from WeArtCommon import dataclass_from_dict, dict_from_dataclass, dataclass_from_list
-import WeArtCommon
+from .WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus, SensorData, AnalogSensorRawData, MiddlewareStatusData, ConnectedDeviceStatus
+from .WeArtCommon import dataclass_from_dict, dict_from_dataclass, dataclass_from_list
+from . import WeArtCommon
 import json
 import time
 import logging
