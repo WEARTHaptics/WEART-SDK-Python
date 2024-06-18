@@ -22,25 +22,32 @@ The minimum setup to use the weart SDK consists of:
 * A TouchDIVER device
 * A Python project using the Low-Level SDK 
 
-You can clone the SDK repository and all the necessary files.
+## pip
+This repository can be fetched using
+```sh
+pip install weartsdk-sky
+```
+
+## Local
+You can clone the SDK repository. Copy the `weartsdk` directory in your project.
 Import any class and reference on your project.
 
 ~~~~~~~~~~~~~{.py}
-from WeArtHapticObject import WeArtHapticObject
-from WeArtCommon import HandSide, ActuationPoint, CalibrationStatus
-from WeArtTemperature import WeArtTemperature
-from WeArtTexture import WeArtTexture
-from WeArtForce import WeArtForce
-from WeArtCommon import TextureType
-from WeArtEffect import TouchEffect
-from WeArtTrackingCalibration import WeArtTrackingCalibration
-from WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
-from WeArtTrackingRawData import WeArtTrackingRawData
-from MiddlewareStatusListener import MiddlewareStatusListener
-from WeArtAnalogSensorData import WeArtAnalogSensorData
+from weartsdk.WeArtHapticObject import WeArtHapticObject
+from weartsdk.WeArtCommon import HandSide, ActuationPoint, CalibrationStatus
+from weartsdk.WeArtTemperature import WeArtTemperature
+from weartsdk.WeArtTexture import WeArtTexture
+from weartsdk.WeArtForce import WeArtForce
+from weartsdk.WeArtCommon import TextureType
+from weartsdk.WeArtEffect import TouchEffect
+from weartsdk.WeArtTrackingCalibration import WeArtTrackingCalibration
+from weartsdk.WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
+from weartsdk.WeArtTrackingRawData import WeArtTrackingRawData
+from weartsdk.MiddlewareStatusListener import MiddlewareStatusListener
+from weartsdk.WeArtAnalogSensorData import WeArtAnalogSensorData
 
-from WeArtClient import WeArtClient
-import WeArtCommon
+from weartsdk.WeArtClient import WeArtClient
+from weartsdk import WeArtCommon
 ~~~~~~~~~~~~~
 
 # Example script
