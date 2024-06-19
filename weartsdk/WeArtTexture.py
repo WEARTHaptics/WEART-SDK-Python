@@ -60,7 +60,7 @@ class WeArtTexture:
             self.__volume = volume
 
     def __eq__(self, other):
-        if (self.active == other.active and self.__textureType == other.textureType() and self.__textureVelocity == other.textureVelocity() and self.__volume == other.volume()):
+        if (self.active == other.active and self.__textureType == other.textureType and self.__textureVelocity == other.textureVelocity and self.__volume == other.volume):
             return True
         else:
             return False

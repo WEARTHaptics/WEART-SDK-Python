@@ -81,6 +81,7 @@ class WeArtClient:
         return self.__Connected
     
     def Close(self):
+        self.__Closing = True
         self.__s.close()
         self.__Connected = False
         self.__NotifyConnectionStatus(False)
@@ -155,16 +156,19 @@ class WeArtClient:
         self.__errorCallbacks.append(callback)
     
     def _OnReceive(self):
-        while True:
-            data = self.__s.recv(4096)
-            str_data = data.decode()
-            self.__logger.debug(f"Received: { str_data }")
-            strings = str_data.split(WeArtClient.messagesSeparator)
-            messages = []
-            for string in strings:
-                messages.append(self._messageSerializer.Deserialize(string))
-            self.__ForwardingMessages(messages)
-        return
+        try:
+            while True:
+                data = self.__s.recv(4096)
+                str_data = data.decode()
+                self.__logger.debug(f"Received: { str_data }")
+                strings = str_data.split(WeArtClient.messagesSeparator)
+                messages = []
+                for string in strings:
+                    messages.append(self._messageSerializer.Deserialize(string))
+                self.__ForwardingMessages(messages)
+        except ConnectionAbortedError:
+            if not self.__Closing:
+                raise
     
     def __ForwardingMessages(self, messages:list[WeArtMessages.WeArtMessage]):
         for msg in messages:
