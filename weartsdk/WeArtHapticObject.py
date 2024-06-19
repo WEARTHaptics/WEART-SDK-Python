@@ -56,11 +56,11 @@ class WeArtHapticObject:
             
             # update temperature
             newTemp = None
-            if tempEffect == None:
+            if tempEffect is None:
                 newTemp = WeArtTemperature()
             else:
                 newTemp = tempEffect.getTemperature()
-            if self.weArtTemperature == None or (not newTemp == self.weArtTemperature):
+            if self.weArtTemperature is None or (not newTemp == self.weArtTemperature):
                 if not newTemp.active:
                     msg = StopTemperatureMessage()
                     self.SendMessage(msg)
@@ -76,11 +76,11 @@ class WeArtHapticObject:
                     forceEffect = effect
                     break
             newForce = None
-            if forceEffect != None:
+            if forceEffect is not None:
                 newForce = forceEffect.getForce()
             else:
                 newForce = WeArtForce()
-            if self.weArtForce == None or (not (newForce == self.weArtForce)):
+            if self.weArtForce is None or (not (newForce == self.weArtForce)):
                 if not (newForce.active):
                     msg = StopForceMessage()
                     self.SendMessage(msg)
@@ -97,11 +97,11 @@ class WeArtHapticObject:
                     texEffect = effect
                     break
             newTex = None
-            if texEffect != None:
+            if texEffect is not None:
                 newTex = texEffect.getTexture()
             else:
                 newTex = WeArtTexture()
-            if self.weArtTexture == None or (not (newTex == self.weArtTexture)):
+            if self.weArtTexture is None or (not (newTex == self.weArtTexture)):
                 if not (newTex.active):
                     msg = StopTextureMessage()
                     self.SendMessage(msg)

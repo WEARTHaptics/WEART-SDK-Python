@@ -21,7 +21,7 @@ logging.basicConfig()
 class WeArtClient:
     messagesSeparator = '~'
 
-    def __init__(self, ip_address, port):
+    def __init__(self, ip_address, port, log_level = logging.DEBUG):
         self._messageSerializer = WeArtMessageSerializer()
         self.__Connected = False
         self.__s = None #socket
@@ -34,7 +34,7 @@ class WeArtClient:
         self.__IP_ADDESS = ip_address
         self.__PORT = port
         self.__logger = logging.getLogger("WeArtClient")
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(log_level)
 
     class ErrorType(Enum):
         ConnectionError = 0
