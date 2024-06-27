@@ -195,3 +195,5 @@ class WeArtClient:
     def __ClearProcessedCallbacks(self):
         for t in self.__pendingCallbacks:
             t.join()
+
+__all__ = ['WeArtClient']

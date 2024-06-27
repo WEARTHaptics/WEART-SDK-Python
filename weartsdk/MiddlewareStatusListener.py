@@ -56,3 +56,4 @@ class MiddlewareStatusListener(WeArtMessageListener):
     def lastStatus(self) -> MiddlewareStatusUpdate:
         return self.__data
 
+__all__ = ['MiddlewareStatusListener', 'MiddlewareStatusUpdate']

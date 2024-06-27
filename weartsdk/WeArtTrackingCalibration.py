@@ -36,4 +36,5 @@ class WeArtTrackingCalibration(WeArtMessageListener):
             self.__result = message.getSuccess()
             for callback in self.__resultCallbacks:
                 callback(self.__currentHand, self.__result)
-    
+
+__all__ = ['WeArtTrackingCalibration']

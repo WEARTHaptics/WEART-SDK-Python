@@ -32,13 +32,19 @@ pip install weartsdk-sky
 You can clone the SDK repository. Copy the `weartsdk` directory in your project.
 Import any class and reference on your project.
 
+# Usage
+You can access most objects through the wildcard import:
+~~~~~~~~~~~~~{.py}
+from weartsdk import *
+~~~~~~~~~~~~~
+
+Otherwise, here are the most common imports:
 ~~~~~~~~~~~~~{.py}
 from weartsdk.WeArtHapticObject import WeArtHapticObject
-from weartsdk.WeArtCommon import HandSide, ActuationPoint, CalibrationStatus
+from weartsdk.WeArtCommon import HandSide, ActuationPoint, CalibrationStatus, TextureType
 from weartsdk.WeArtTemperature import WeArtTemperature
 from weartsdk.WeArtTexture import WeArtTexture
 from weartsdk.WeArtForce import WeArtForce
-from weartsdk.WeArtCommon import TextureType
 from weartsdk.WeArtEffect import TouchEffect
 from weartsdk.WeArtTrackingCalibration import WeArtTrackingCalibration
 from weartsdk.WeArtThimbleTrackingObject import WeArtThimbleTrackingObject

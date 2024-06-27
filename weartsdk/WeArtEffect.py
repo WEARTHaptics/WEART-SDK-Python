@@ -46,6 +46,4 @@ class TouchEffect(WeArtEffect):
 
         return changed
 
-
-
-
+__all__ = ['WeArtEffect', 'TouchEffect']

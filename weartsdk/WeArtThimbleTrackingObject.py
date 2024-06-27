@@ -23,3 +23,5 @@ class WeArtThimbleTrackingObject(WeArtMessageListener):
     
     def GetAbduction(self):
         return self._abduction
+
+__all__ = ['WeArtThimbleTrackingObject']

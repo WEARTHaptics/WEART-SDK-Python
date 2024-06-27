@@ -45,3 +45,5 @@ class WeArtTrackingRawData(WeArtMessageListener):
         
         for callback in self.__callbacks:
             callback(sample)
+
+__all__ = ['WeArtTrackingRawData']

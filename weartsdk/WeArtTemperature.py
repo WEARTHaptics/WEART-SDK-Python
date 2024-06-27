@@ -26,4 +26,4 @@ class WeArtTemperature:
         else:
             return False
 
-
+__all__ = ['WeArtTemperature']

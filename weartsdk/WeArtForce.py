@@ -26,4 +26,4 @@ class WeArtForce:
         else:
             return False
 
-
+__all__ = ['WeArtForce']

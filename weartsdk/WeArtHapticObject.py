@@ -122,3 +122,4 @@ class WeArtHapticObject:
                         msg.setActuationPoint(ap)
                         self.__client.SendMessage(msg)
 
+__all__ = ['WeArtHapticObject']

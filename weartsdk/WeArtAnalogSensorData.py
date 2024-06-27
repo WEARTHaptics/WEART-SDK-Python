@@ -40,3 +40,5 @@ class WeArtAnalogSensorData(WeArtMessageListener):
         self.__lastSample = sample
         for callback in self.__callbacks:
             callback(sample)
+
+__all__ = ['WeArtAnalogSensorData']

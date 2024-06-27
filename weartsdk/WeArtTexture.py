@@ -65,5 +65,4 @@ class WeArtTexture:
         else:
             return False
     
-
-
+__all__ = ['WeArtTexture']
