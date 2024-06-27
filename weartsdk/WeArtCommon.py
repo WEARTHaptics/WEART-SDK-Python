@@ -207,3 +207,5 @@ thresholdMiddleClosure = 0.5
 
 defaultGraspForce = 0.3
 dynamicForceSensibility = 10.0
+
+__all__ = [] # so we do not fill up the imports

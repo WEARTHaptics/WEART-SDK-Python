@@ -21,9 +21,9 @@ class WeArtTemperature:
             self.__value = temperature
 
     def __eq__(self, other):
-        if (self.active == other.active and self.__value == other.value()):
+        if (self.active == other.active and self.__value == other.value):
             return True
         else:
             return False
 
-
+__all__ = ['WeArtTemperature']

@@ -1,4 +1,4 @@
-import WeArtMessages as WeArtMessages
+from . import WeArtMessages as WeArtMessages
 
 class WeArtMessageListener:
     def __init__(self, ids:list[str]):
