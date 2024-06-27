@@ -166,7 +166,7 @@ class WeArtClient:
                 for string in strings:
                     messages.append(self._messageSerializer.Deserialize(string))
                 self.__ForwardingMessages(messages)
-        except ConnectionAbortedError:
+        except Exception:
             if not self.__Closing:
                 raise
     
