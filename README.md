@@ -25,7 +25,7 @@ The minimum setup to use the weart SDK consists of:
 ## pip
 This repository can be fetched using
 ```sh
-pip install weartsdk-sky
+pip install weartsdk
 ```
 
 ## Local
@@ -34,12 +34,12 @@ Import any class and reference on your project.
 
 # Usage
 You can access most objects through the wildcard import:
-~~~~~~~~~~~~~{.py}
+```py
 from weartsdk import *
-~~~~~~~~~~~~~
+```
 
 Otherwise, here are the most common imports:
-~~~~~~~~~~~~~{.py}
+```py
 from weartsdk.WeArtHapticObject import WeArtHapticObject
 from weartsdk.WeArtCommon import HandSide, ActuationPoint, CalibrationStatus, TextureType
 from weartsdk.WeArtTemperature import WeArtTemperature
@@ -54,7 +54,7 @@ from weartsdk.WeArtAnalogSensorData import WeArtAnalogSensorData
 
 from weartsdk.WeArtClient import WeArtClient
 from weartsdk import WeArtCommon
-~~~~~~~~~~~~~
+```
 
 # Example script
 In the repository you will find a *test.py* script with all the snippets you need to work with the WEART SDK
@@ -67,17 +67,17 @@ In order to do so, it's important to start the middleware with the proper comman
 
 To start the middleware operations, call the Start() method.
 
-~~~~~~~~~~~~~{.py}
+```py
 client = WeArtClient(WeArtCommon.DEFAULT_IP_ADDRESS, WeArtCommon.DEFAULT_TCP_PORT)
 client.Run()
 client.Start()
-~~~~~~~~~~~~~
+```
 
 To stop the middleware, call the Stop() method.
 
-~~~~~~~~~~~~~{.py}
+```py
 client.Stop();
-~~~~~~~~~~~~~
+```
 
 ## Devices calibration
 After starting the communication with the middleware, it's now possible to calibrate the TouchDIVER devices.
@@ -86,30 +86,30 @@ The calibration allows to set the initial offsets of each thimble relative to th
 First, create the calibration tracking object and add it to the client. The WeArtTrackingCalibration object allows to listen for calibration messages
 from the middleware, and get notified when the calibration process ends.
 
-~~~~~~~~~~~~~{.py}
+```py
 calibration = WeArtTrackingCalibration()
 client.AddMessageListener(calibration)
 # Start Calibration Finger tracking algorithm
 client.StartCalibration()
-~~~~~~~~~~~~~
+```
 
 Then, start the calibration procedure. This will allow the middleware to calibrate the hand sensor offsets based on the current setup (thimbles and control device position, hand inclination, personal differences in the fingers etc..).
 
-~~~~~~~~~~~~~{.py}
+```py
 client.StartCalibration()
-~~~~~~~~~~~~~
+```
 
 It’s possible to get the calibration status and result from the tracker object itself, or through callbacks
 
-~~~~~~~~~~~~~{.py}
+```py
 calibration.getResult()
-~~~~~~~~~~~~~
+```
 
 You can stop the calibration anytime
 
-~~~~~~~~~~~~~{.py}
+```py
 client.StopCalibration()
-~~~~~~~~~~~~~
+```
 
 ## Haptic feedback
 
@@ -121,11 +121,11 @@ Every thimble can apply a certain amount of pressure, temperature and vibration 
 A WeArtHapticObject is the basic object used to apply haptic feedback.
 To create one, use the following code:
 
-~~~~~~~~~~~~~{.cpp}
+```{.cpp}
 hapticObject = WeArtHapticObject(client)
 hapticObject.handSideFlag = HandSide.Right.value
 hapticObject.actuationPointFlag = ActuationPoint.Index | ActuationPoint.Middle
-~~~~~~~~~~~~~
+```
 
 
 ### Create Effect
@@ -136,9 +136,9 @@ For different use cases (e.g. values not directly set, but computed from other p
 
 Create the object on which the temperature, force and texture values will be applied:
 
-~~~~~~~~~~~~~{.cpp}
+```{.cpp}
 touchEffect = TouchEffect(WeArtTemperature(), WeArtForce(), WeArtTexture())
-~~~~~~~~~~~~~
+```
 
 ### Add or Update Effect
 
@@ -148,7 +148,7 @@ In the example below, the effect created in the previous section is updated with
 It is then added to the haptic object if not already present, otherwise the haptic object is updated in order to send the new 
 effect parameters to the middleware and then to the device.
 
-~~~~~~~~~~~~~{.py}
+```py
 # Temperature properties
 temperature = WeArtTemperature()
 temperature.active = True
@@ -169,7 +169,7 @@ if (len(hapticObject.activeEffects) <= 0):
 else:
     # Update the effect over time
     hapticObject.UpdateEffects()
-~~~~~~~~~~~~~
+```
 
 @note When multiple effects are added to a WeArtHapticObject, which effect is applied depends on the order in which the effects are added. In particular, for each value (temperature, force, texture) only the latest active one will be applied.
 
@@ -177,9 +177,9 @@ else:
 
 If an effect is not needed anymore, it can be removed from the haptic object with the *RemoveEffect* method.
 
-~~~~~~~~~~~~~{.py}
+```py
 hapticObject.RemoveEffect(touchEffect)
-~~~~~~~~~~~~~
+```
 
 ## Tracking
 
@@ -187,10 +187,10 @@ After starting the middleware and performing the device calibration, it's possib
 related to the TouchDIVER thimbles.
 
 To read these values, create and set a thimble tracker object for monitoring the closure/abduction value of a given finger:
-~~~~~~~~~~~~~{.py}
+```py
 thumbThimbleTracking = WeArtThimbleTrackingObject(HandSide.Right, ActuationPoint.Thumb)
 client.AddThimbleTracking(thumbThimbleTracking)
-~~~~~~~~~~~~~
+```
 
 Once this object is added to the client, it will start receiving the tracking values.
 To access the closure and abduction values, simply use the getters provided by the thimble tracking object.
@@ -199,10 +199,10 @@ The closure value ranges from 0 (opened) to 1 (closed).
 
 The abduction value ranges from 0 (finger near the hand's central axis) to 1 (finger far from the hand central axis).
 
-~~~~~~~~~~~~~{.py}
+```py
 closure = thumbThimbleTracking.GetClosure()
 abduction = thumbThimbleTracking.GetAbduction()
-~~~~~~~~~~~~~
+```
 
 @note The **closure** value is available for all thimbles, while the **abduction** value is available only for the thumb (other thimbles will have a value of 0).
 
@@ -215,10 +215,10 @@ Each sensor has:
 * Time of Flight sensor
 
 To read these values, create a WeArtTrackingRawData object and add it to the client.
-~~~~~~~~~~~~~{.py}
+```py
 trackingRawSensorData = WeArtTrackingRawData(HandSide.Right, ActuationPoint.Index)
 client.AddMessageListener(trackingRawSensorData)
-~~~~~~~~~~~~~
+```
 
 Once this object is added to the client, it will listen for raw data messages.
 To start receiving raw data from the middleware, call the client.StartRawData() method.
@@ -226,13 +226,13 @@ To stop receiving raw data, call the client.StopRawData() method.
 
 To get the sensors data, get the latest sample (WeArtTrackingRawData::Sample) from the WeArtTrackingRawData object.
 The sample contains the accelerometer, gyroscope and time of flight data, in addition to the timestamp of its sampling (generated by the middleware and represented as milliseconds in unix epoch time).
-~~~~~~~~~~~~~{.py}
+```py
 ts = trackingRawSensorData.GetLastSample().timestamp 
 sample = trackingRawSensorData.GetLastSample()
 accX = sample.data.accelerometer.x
 accY = sample.data.accelerometer.y
 accZ = sample.data.accelerometer.z
-~~~~~~~~~~~~~
+```
 
 @note The Palm (control unit) doesn't contain a Time-Of-Flight sensor, so its value is always set to 0.
 
@@ -247,20 +247,20 @@ Each sensor has:
 * FSR - force sensing resistor (raw adata and converted newton)
 
 To read these values, create a WeArtAnalogSensorData object and add it to the client.
-~~~~~~~~~~~~~{.py}
+```py
 analogSensorData = WeArtAnalogSensorData(HandSide.Right, ActuationPoint.Index)
 client.AddMessageListener(analogSensorData)
-~~~~~~~~~~~~~
+```
 
 Once this object is added to the client, it will listen for raw data messages as soon the Middleware is on start.
 
 To get the sensors data, get the latest sample.
 
-~~~~~~~~~~~~~{.py}
+```py
 ts = analogSensorData.GetLastSample().timestamp
 sample = analogSensorData.GetLastSample()
 forceSensingRaw = sample.data.forceSensingRaw
-~~~~~~~~~~~~~
+```
 
 @note The Palm (control unit) doesn't contain a analog sensor, so its value is always set to 0.
 
@@ -271,10 +271,10 @@ forceSensingRaw = sample.data.forceSensingRaw
 The SDK allows to track and receives updates about the middleware and the connected devices status.
 
 In particular, the information is available through a MiddlewareStatusListener object, that must be added as listener to the client object:
-~~~~~~~~~~~~~{.py}
+```py
 mwListener = MiddlewareStatusListener()
 client.AddMessageListener(mwListener)
-~~~~~~~~~~~~~
+```
 
 The MiddlewareListener tracks the messages from the middleware, saving and notifying about status changes.
 In particular, it's possible to register callbacks for the middleware and devices status.
