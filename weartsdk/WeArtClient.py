@@ -24,6 +24,7 @@ class WeArtClient:
     def __init__(self, ip_address, port, log_level = logging.DEBUG):
         self._messageSerializer = WeArtMessageSerializer()
         self.__Connected = False
+        self.__Closing = False
         self.__s = None #socket
         self.__thimbleTrackingObjects = []
         self.__messageListeners = []
@@ -31,7 +32,7 @@ class WeArtClient:
         self.__connectionStatusCallbacks = []
         self.__errorCallbacks = []
         self.__pendingCallbacks = []
-        self.__IP_ADDESS = ip_address
+        self.__IP_ADDRESS = ip_address
         self.__PORT = port
         self.__logger = logging.getLogger("WeArtClient")
         self.__logger.setLevel(log_level)
@@ -56,7 +57,7 @@ class WeArtClient:
     def Run(self):
         try:
             self.__s = socket.socket()
-            server_addr = (self.__IP_ADDESS, self.__PORT)
+            server_addr = (self.__IP_ADDRESS, self.__PORT)
             self.__s.connect(server_addr)
             self.__logger.info(f"Connection to server: { server_addr } established.")
             self.__Connected = True
