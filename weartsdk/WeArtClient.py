@@ -6,14 +6,14 @@ from threading import Thread
 from enum import Enum
 import logging
 
-import WeArtCommon
-from WeArtCommon import TrackingType
-import WeArtMessages as WeArtMessages
-from WeArtMessageSerializer import WeArtMessageSerializer
-from  WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
-from WeArtMessageListener import WeArtMessageListener
-from WeArtTrackingRawData import WeArtTrackingRawData
-from WeArtAnalogSensorData import WeArtAnalogSensorData
+from . import WeArtCommon
+from .WeArtCommon import TrackingType
+from . import WeArtMessages as WeArtMessages
+from .WeArtMessageSerializer import WeArtMessageSerializer
+from  .WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtTrackingRawData import WeArtTrackingRawData
+from .WeArtAnalogSensorData import WeArtAnalogSensorData
 
 
 logging.basicConfig()
@@ -21,9 +21,10 @@ logging.basicConfig()
 class WeArtClient:
     messagesSeparator = '~'
 
-    def __init__(self, ip_address, port):
+    def __init__(self, ip_address, port, log_level = logging.DEBUG):
         self._messageSerializer = WeArtMessageSerializer()
         self.__Connected = False
+        self.__Closing = False
         self.__s = None #socket
         self.__thimbleTrackingObjects = []
         self.__messageListeners = []
@@ -31,10 +32,10 @@ class WeArtClient:
         self.__connectionStatusCallbacks = []
         self.__errorCallbacks = []
         self.__pendingCallbacks = []
-        self.__IP_ADDESS = ip_address
+        self.__IP_ADDRESS = ip_address
         self.__PORT = port
         self.__logger = logging.getLogger("WeArtClient")
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(log_level)
 
     class ErrorType(Enum):
         ConnectionError = 0
@@ -56,7 +57,7 @@ class WeArtClient:
     def Run(self):
         try:
             self.__s = socket.socket()
-            server_addr = (self.__IP_ADDESS, self.__PORT)
+            server_addr = (self.__IP_ADDRESS, self.__PORT)
             self.__s.connect(server_addr)
             self.__logger.info(f"Connection to server: { server_addr } established.")
             self.__Connected = True
@@ -81,6 +82,7 @@ class WeArtClient:
         return self.__Connected
     
     def Close(self):
+        self.__Closing = True
         self.__s.close()
         self.__Connected = False
         self.__NotifyConnectionStatus(False)
@@ -155,16 +157,19 @@ class WeArtClient:
         self.__errorCallbacks.append(callback)
     
     def _OnReceive(self):
-        while True:
-            data = self.__s.recv(4096)
-            str_data = data.decode()
-            self.__logger.debug(f"Received: { str_data }")
-            strings = str_data.split(WeArtClient.messagesSeparator)
-            messages = []
-            for string in strings:
-                messages.append(self._messageSerializer.Deserialize(string))
-            self.__ForwardingMessages(messages)
-        return
+        try:
+            while True:
+                data = self.__s.recv(4096)
+                str_data = data.decode()
+                self.__logger.debug(f"Received: { str_data }")
+                strings = str_data.split(WeArtClient.messagesSeparator)
+                messages = []
+                for string in strings:
+                    messages.append(self._messageSerializer.Deserialize(string))
+                self.__ForwardingMessages(messages)
+        except Exception:
+            if not self.__Closing:
+                raise
     
     def __ForwardingMessages(self, messages:list[WeArtMessages.WeArtMessage]):
         for msg in messages:
@@ -191,3 +196,5 @@ class WeArtClient:
     def __ClearProcessedCallbacks(self):
         for t in self.__pendingCallbacks:
             t.join()
+
+__all__ = ['WeArtClient']

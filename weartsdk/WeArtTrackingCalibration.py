@@ -1,5 +1,5 @@
-from WeArtMessageListener import WeArtMessageListener
-from WeArtMessages import CalibrationResultMessage, CalibrationStatusMessage, WeArtMessage
+from .WeArtMessageListener import WeArtMessageListener
+from .WeArtMessages import CalibrationResultMessage, CalibrationStatusMessage, WeArtMessage
 
 class WeArtTrackingCalibration(WeArtMessageListener):
     def __init__(self):
@@ -36,4 +36,5 @@ class WeArtTrackingCalibration(WeArtMessageListener):
             self.__result = message.getSuccess()
             for callback in self.__resultCallbacks:
                 callback(self.__currentHand, self.__result)
-    
+
+__all__ = ['WeArtTrackingCalibration']

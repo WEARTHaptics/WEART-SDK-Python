@@ -1,6 +1,6 @@
-from WeArtTemperature import WeArtTemperature
-from WeArtForce import WeArtForce
-from WeArtTexture import WeArtTexture
+from .WeArtTemperature import WeArtTemperature
+from .WeArtForce import WeArtForce
+from .WeArtTexture import WeArtTexture
 
 class WeArtEffect:
     def __init__(self):
@@ -46,6 +46,4 @@ class TouchEffect(WeArtEffect):
 
         return changed
 
-
-
-
+__all__ = ['WeArtEffect', 'TouchEffect']
