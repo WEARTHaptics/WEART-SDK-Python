@@ -1,11 +1,12 @@
 [project]
 name = "weartsdk"
-version = "#{VERSION}#"
+version = "1.0.3"
 authors = [
   { name="Emanuele De Santis", email="trunk96@gmail.com" },
+  { name="WEART Srl", email="support@weart.it" }
 ]
 maintainers = [
-  { name="WEART" },
+  { name="WEART Srl" },
 ]
 description = "WEART SDK low-level Python"
 readme = "README.md"

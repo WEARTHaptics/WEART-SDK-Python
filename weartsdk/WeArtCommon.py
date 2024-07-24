@@ -171,7 +171,7 @@ def dict_from_dataclass(k):
 DEFAULT_IP_ADDRESS = "127.0.0.1"
 DEFAULT_TCP_PORT = 13031
 
-WEART_SDK_VERSION = "1.0.0"
+WEART_SDK_VERSION = "1.0.3"
 WEART_SDK_TYPE = "SdkLLCPP"
 
 defaultTemperature = 0.5
