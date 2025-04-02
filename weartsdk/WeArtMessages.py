@@ -1,16 +1,15 @@
-from .WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus, SensorData, AnalogSensorRawData, MiddlewareStatusData, ConnectedDeviceStatus
+from .WeArtCommon import TrackingType, HandSide, ActuationPoint, CalibrationStatus, SensorData, AnalogSensorRawData, MiddlewareStatusData, WeArtAppStatusData, ConnectedDeviceStatus, G2DeviceStatus
 from .WeArtCommon import dataclass_from_dict, dict_from_dataclass, dataclass_from_list
 from . import WeArtCommon
 import json
 import time
-import logging
 
-def StringToTrackingType(string:str):
+def StringToTrackingType(string: str):
 	if (string == "TrackType1"):
 		return TrackingType.WEART_HAND
 	return TrackingType.DEFAULT
 
-def TrackingTypeToString(trackType:TrackingType):
+def TrackingTypeToString(trackType: TrackingType):
     if trackType == TrackingType.DEFAULT:
         return ""
     elif trackType == TrackingType.WEART_HAND:
@@ -18,7 +17,7 @@ def TrackingTypeToString(trackType:TrackingType):
     else:
 	    return ""
     
-def StringToHandside(string:str):
+def StringToHandside(string: str):
     if (string == "LEFT"):
         return HandSide.Left
     elif (string == "RIGHT"):
@@ -27,7 +26,7 @@ def StringToHandside(string:str):
         assert(False)
         return HandSide.Left
 
-def HandsideToString(hs:HandSide):
+def HandsideToString(hs: HandSide):
     if (hs == HandSide.Left):
         return "LEFT"
     elif (hs == HandSide.Right):
@@ -36,20 +35,22 @@ def HandsideToString(hs:HandSide):
         assert(False)
         return ""
 
-
-def StringToActuationPoint(string:str):
+def StringToActuationPoint(string: str):
     if string == "THUMB":
         return ActuationPoint.Thumb
     elif string == "INDEX":
         return ActuationPoint.Index
     elif string == "MIDDLE":
         return ActuationPoint.Middle
+    elif string == "ANNULAR":
+        return ActuationPoint.Annular
+    elif string == "PINKY":
+        return ActuationPoint.Pinky
     elif string == "PALM":
         return ActuationPoint.Palm
     else:
         assert(False)
         return ActuationPoint.Thumb
-
 
 def ActuationPointToString(ap: ActuationPoint):
     if ap == ActuationPoint.Thumb:
@@ -58,6 +59,10 @@ def ActuationPointToString(ap: ActuationPoint):
         return "INDEX"
     elif ap == ActuationPoint.Middle:
         return "MIDDLE"
+    elif ap == ActuationPoint.Annular:
+        return "ANNULAR"
+    elif ap == ActuationPoint.Pinky:
+        return "PINKY"
     elif ap == ActuationPoint.Palm:
         return "PALM"
     else:
@@ -67,7 +72,6 @@ def ActuationPointToString(ap: ActuationPoint):
 def CalibrationHandSideToString(hs: HandSide):
     return "0" if hs == HandSide.Left else "1"
     
-
 def StringToCalibrationHandSide(string: str):
     if (string == "0"):
         return HandSide.Left
@@ -76,10 +80,11 @@ def StringToCalibrationHandSide(string: str):
     assert(False)
     return HandSide.Left
 
-
 class WeArtMessage:
-	#@brief Allows to get the message ID, used to deserialize the correct message type
-	#@return the message ID
+    """
+    Base class for all messages.
+    This class provides basic methods for getting and setting message values, and handling actuation points and hand sides.
+    """
     def __init__(self):
         return
 
@@ -92,14 +97,18 @@ class WeArtMessage:
     def setValues(self):
         return
 
-    def setHandSide(self, handside:HandSide):
+    def setHandSide(self, handside: HandSide):
         return
 
-    def setActuationPoint(self, actuation_point:ActuationPoint):
+    def setActuationPoint(self, actuation_point: ActuationPoint):
         return
 
 class WeArtCsvMessage(WeArtMessage):
+    """
+    This class is the base class used to serialize and deserialize CSV messages.
+    """
     field_separator = ':'
+    
     def __init__(self):
         super().__init__()
 
@@ -110,6 +119,12 @@ class WeArtCsvMessage(WeArtMessage):
         return super().setValues()
     
     def serialize(self)->str:
+        """
+        Serializes the message to a string in CSV format.
+
+        Returns:
+            str: The serialized message as a CSV string.
+        """
         messageID = self.getID()
         serializedValues = self.getValues()
 
@@ -123,12 +138,21 @@ class WeArtCsvMessage(WeArtMessage):
         return ss
     
     def deserialize(self, message:str)->None:
+        """
+        Deserializes a CSV message string into the message object.
+
+        Parameters:
+            message (str): The CSV message string to deserialize.
+        """
         strings = message.split(":")
         strings = strings[1:]
         self.setValues(strings)
         return 
 
 class WeArtJsonMessage(WeArtMessage):
+    """
+    This class is the base class used to serialize and deserialize JSON messages.
+    """
     def __init__(self):
         super().__init__()
         self._timestamp = int(time.time() * 1000)
@@ -137,6 +161,12 @@ class WeArtJsonMessage(WeArtMessage):
         return self._timestamp
     
     def serialize(self) -> str:
+        """
+        Serializes the message to a JSON string.
+
+        Returns:
+            str: The serialized message as a JSON string.
+        """
         j = {}
         j["type"] = self.getID()
         j["ts"] = self._timestamp
@@ -146,16 +176,22 @@ class WeArtJsonMessage(WeArtMessage):
         
         return json.dumps(j)
     
-    def deserialize(self, message:str)->None:
+    def deserialize(self, message: str) -> None:
+        """
+        Deserializes a JSON message string into the message object.
+
+        Parameters:
+            message (str): The JSON message string to deserialize.
+        """
         j = json.loads(message)
         self._timestamp = int(j["ts"])
         if "data" in j:
             self._deserializePayload(j["data"])
     
-    def setHandSide(self, handside: HandSide)->None:
+    def setHandSide(self, handside: HandSide) -> None:
         return 
     
-    def setActuationPoint(self, actuation_point: ActuationPoint)->None:
+    def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
         return 
 
     def _serializePayload(self):
@@ -164,7 +200,6 @@ class WeArtJsonMessage(WeArtMessage):
     def _deserializePayload(self):
         return
     
-
 class WeArtMessageNoParams(WeArtCsvMessage):
     def __init__(self):
         super().__init__()
@@ -175,22 +210,19 @@ class WeArtMessageNoParams(WeArtCsvMessage):
     def setValues(self, values):
         return
     
-
-
 class WeArtMessageObjectSpecific(WeArtCsvMessage):
     def __init__(self):
         self._handSide = None
         self._actuationPoint = None
     
-    def setHandSide(self, handside:HandSide):
+    def setHandSide(self, handside: HandSide):
         self._handSide = handside
     
     def getActuationPoint(self):
         return self._actuationPoint
     
-    def setActuationPoint(self, actuation_point:ActuationPoint):
+    def setActuationPoint(self, actuation_point: ActuationPoint):
         self._actuationPoint = actuation_point
-
 
 class WeArtMessageHandSpecific(WeArtCsvMessage):
     def __init__(self):
@@ -205,7 +237,6 @@ class WeArtMessageHandSpecific(WeArtCsvMessage):
     
     def setActuationPoint(self, actuation_point: ActuationPoint):
         return
-
 
 class StartFromClientMessage(WeArtMessageNoParams):
     ID = "StartFromClient"
@@ -237,7 +268,6 @@ class StopFromClientMessage(WeArtMessageNoParams):
     def getID(self):
         return self.ID
     
-
 class StartCalibrationMessage(WeArtMessageNoParams):
 	ID = "StartCalibration"
 
@@ -274,8 +304,6 @@ class CalibrationStatusMessage(WeArtMessageHandSpecific):
         self._handSide = StringToCalibrationHandSide(values[0])
         self._status = CalibrationStatus(int(values[1]))
 
-
-
 class CalibrationResultMessage(WeArtMessageHandSpecific):
     ID = "CalibrationResult"
 
@@ -300,7 +328,6 @@ class CalibrationResultMessage(WeArtMessageHandSpecific):
         self._handSide = StringToCalibrationHandSide(values[0])
         self._success = int(values[1]) == 0
 
-
 class TrackingMessage(WeArtMessageNoParams):
     ID = "Tracking"
 
@@ -308,18 +335,17 @@ class TrackingMessage(WeArtMessageNoParams):
         self.Angles = {"X":0.0, "Y": 0.0, "Z": 0.0}
         self._trackingType = trackType
         # Closures
-        self.__RightThumbClosure = 0
-        self.__RightIndexClosure = 0
-        self.__RightMiddleClosure = 0
-        self.__RightPalmClosure = 0
-        self.__LeftThumbClosure = 0
-        self.__LeftIndexClosure = 0
-        self.__LeftMiddleClosure = 0
-        self.__LeftPalmClosure = 0
-
+        self.__RightThumbClosure    = 0
+        self.__RightIndexClosure    = 0
+        self.__RightMiddleClosure   = 0
+        self.__RightPalmClosure     = 0
+        self.__LeftThumbClosure     = 0
+        self.__LeftIndexClosure     = 0
+        self.__LeftMiddleClosure    = 0
+        self.__LeftPalmClosure      = 0
         # Abductions
-        self.__RightThumbAbduction = 0
-        self.__LeftThumbAbduction = 0
+        self.__RightThumbAbduction  = 0
+        self.__LeftThumbAbduction   = 0
 
     def getID(self):
         return self.ID
@@ -348,34 +374,34 @@ class TrackingMessage(WeArtMessageNoParams):
             ret.append(str(self.__LeftMiddleClosure))
         return ret
     
-    def setValues(self, values:list[str]):
+    def setValues(self, values: list[str]):
         self._trackingType = StringToTrackingType(values[0])
         if self._trackingType == TrackingType.DEFAULT:
-            assert(len(values)==8)
-            self.__RightThumbClosure = int(values[0])
-            self.__RightIndexClosure = int(values[1])
-            self.__RightMiddleClosure = int(values[2])
-            self.__RightPalmClosure = int(values[3])
-            self.__LeftThumbClosure = int(values[4])
-            self.__LeftIndexClosure = int(values[5])
-            self.__LeftMiddleClosure = int(values[6])
-            self.__LeftPalmClosure = int(values[7])
+            assert(len(values) == 8)
+            self.__RightThumbClosure    = int(values[0])
+            self.__RightIndexClosure    = int(values[1])
+            self.__RightMiddleClosure   = int(values[2])
+            self.__RightPalmClosure     = int(values[3])
+            self.__LeftThumbClosure     = int(values[4])
+            self.__LeftIndexClosure     = int(values[5])
+            self.__LeftMiddleClosure    = int(values[6])
+            self.__LeftPalmClosure      = int(values[7])
         elif self._trackingType == TrackingType.WEART_HAND:
-            assert(len(values)==9)
-            self.__RightIndexClosure = int(values[1])
-            self.__RightThumbClosure = int(values[2])
-            self.__RightThumbAbduction = int(values[3])
-            self.__RightMiddleClosure = int(values[4])
+            assert(len(values) == 9)
+            self.__RightIndexClosure    = int(values[1])
+            self.__RightThumbClosure    = int(values[2])
+            self.__RightThumbAbduction  = int(values[3])
+            self.__RightMiddleClosure   = int(values[4])
 
-            self.__LeftIndexClosure = int(values[5])
-            self.__LeftThumbClosure = int(values[6])
-            self.__LeftThumbAbduction = int(values[7])
-            self.__LeftMiddleClosure = int(values[8])
+            self.__LeftIndexClosure     = int(values[5])
+            self.__LeftThumbClosure     = int(values[6])
+            self.__LeftThumbAbduction   = int(values[7])
+            self.__LeftMiddleClosure    = int(values[8])
 
     def GetType(self):
         return self._trackingType
     
-    def GetAbduction(self, handSide:HandSide, actuationPoint:ActuationPoint):
+    def GetAbduction(self, handSide: HandSide, actuationPoint: ActuationPoint):
         maxAbductionValue = 255.0
         if handSide == HandSide.Left:
             if (actuationPoint == ActuationPoint.Thumb):
@@ -384,9 +410,8 @@ class TrackingMessage(WeArtMessageNoParams):
             if (actuationPoint == ActuationPoint.Thumb):
                 return float(self.__RightThumbAbduction) / maxAbductionValue
         return WeArtCommon.defaultAbduction
-    
-    
-    def GetClosure(self, handSide:HandSide, actuationPoint:ActuationPoint):
+      
+    def GetClosure(self, handSide: HandSide, actuationPoint: ActuationPoint):
         byteValue = 0
         if handSide == HandSide.Left:
             if actuationPoint == ActuationPoint.Thumb:
@@ -408,11 +433,99 @@ class TrackingMessage(WeArtMessageNoParams):
                 byteValue = self.__RightPalmClosure
         closure = float(byteValue) / float(255)
         return closure
+
+class TrackingBendingG2Message(WeArtJsonMessage):
+    ID = "TRACKING_BENDING_G2"
+
+    def __init__(self):
+        self.__handSide = HandSide.Left
+        self.__wrist = {"X":0.0, "Y": 0.0, "Z": 0.0, "W": 0.0}
+        # Closures
+        self.__ThumbClosure     = 0
+        self.__IndexClosure     = 0
+        self.__MiddleClosure    = 0
+        self.__AnnularClosure   = 0
+        self.__PinkyClosure     = 0
+        self.__PalmClosure      = 0
+        # Abductions
+        self.__ThumbAbduction   = 0
+        self.__IndexAbduction   = 0
+        self.__MiddleAbduction  = 0
+        self.__AnnularAbduction = 0
+        self.__PinkyAbduction   = 0
+        self.__PalmAbduction    = 0
+
+    def getID(self):
+        return self.ID
+
+    def GetHandSide(self):
+        return self.__handSide
     
+    def GetAbduction(self, actuationPoint: ActuationPoint):
+        if actuationPoint == ActuationPoint.Thumb:
+            return self.__ThumbAbduction
+        elif actuationPoint == ActuationPoint.Index:
+            return self.__IndexAbduction
+        elif actuationPoint == ActuationPoint.Middle:
+            return self.__MiddleAbduction
+        elif actuationPoint == ActuationPoint.Annular:
+            return self.__AnnularAbduction
+        elif actuationPoint == ActuationPoint.Pinky:
+            return self.__PinkyAbduction
+        elif actuationPoint == ActuationPoint.Palm:
+            return self.__PalmAbduction
+        else:
+            return None
+
+    def GetClosure(self, actuationPoint: ActuationPoint):
+        if actuationPoint == ActuationPoint.Thumb:
+            return self.__ThumbClosure
+        elif actuationPoint == ActuationPoint.Index:
+            return self.__IndexClosure
+        elif actuationPoint == ActuationPoint.Middle:
+            return self.__MiddleClosure
+        elif actuationPoint == ActuationPoint.Annular:
+            return self.__AnnularClosure
+        elif actuationPoint == ActuationPoint.Pinky:
+            return self.__PinkyClosure
+        elif actuationPoint == ActuationPoint.Palm:
+            return self.__PalmClosure
+        else:
+            return None
+
+    def _deserializePayload(self, payload: dict) -> None:
+        # Hand side
+        self.__handSide = HandSide.Right if payload.get("handSide") == "RIGHT" else HandSide.Left
+        # Wrist quaternion
+        wrist_data = payload.get("wrist", {}).get("quaternion", {})
+        self.__wrist = {
+            "X": wrist_data.get("x", 0.0),
+            "Y": wrist_data.get("y", 0.0),
+            "Z": wrist_data.get("z", 0.0),
+            "W": wrist_data.get("w", 0.0),
+        }
+        # Finger closures
+        self.__ThumbClosure     = payload.get("thumb", {}).get("closure", 0.0)
+        self.__IndexClosure     = payload.get("index", {}).get("closure", 0.0)
+        self.__MiddleClosure    = payload.get("middle", {}).get("closure", 0.0)
+        self.__AnnularClosure   = payload.get("annular", {}).get("closure", 0.0)
+        self.__PinkyClosure     = payload.get("pinky", {}).get("closure", 0.0)
+        self.__PalmClosure      = payload.get("palm", {}).get("closure", 0.0)
+        # Finger abductions
+        self.__ThumbAbduction   = payload.get("thumb", {}).get("abduction", 0.0)
+        self.__IndexAbduction   = payload.get("index", {}).get("abduction", 0.0)
+        self.__MiddleAbduction  = payload.get("middle", {}).get("abduction", 0.0)
+        self.__AnnularAbduction = payload.get("annular", {}).get("abduction", 0.0)
+        self.__PinkyAbduction   = payload.get("pinky", {}).get("abduction", 0.0)
+        self.__PalmAbduction    = payload.get("palm", {}).get("abduction", 0.0)
+
+    def __str__(self):
+        return "TrackingBendingG2Message: " + str(self.__dict__)
+
 class SetTemperatureMessage(WeArtMessageObjectSpecific):
     ID = "temperature"
 
-    def __init__(self, t:float):
+    def __init__(self, t: float):
         super().__init__()
         self._temperature = t
     
@@ -426,13 +539,12 @@ class SetTemperatureMessage(WeArtMessageObjectSpecific):
         ret.append(ActuationPointToString(self._actuationPoint))
         return ret
     
-    def setValues(self, values:list[str]):
+    def setValues(self, values: list[str]):
         assert(len(values)==3)
         self._temperature = float(values[0])
         self._handSide = StringToHandside(values[1])
         self._actuationPoint= StringToActuationPoint(values[2])
-
-    
+  
 class StopTemperatureMessage(WeArtMessageObjectSpecific):
     ID = "stopTemperature"
 
@@ -440,8 +552,7 @@ class StopTemperatureMessage(WeArtMessageObjectSpecific):
         super().__init__()
 
     def getID(self):
-        return self.ID
-    
+        return self.ID   
 
     def getValues(self):
         ret = [HandsideToString(self._handSide), ActuationPointToString(self._actuationPoint)]
@@ -455,7 +566,7 @@ class StopTemperatureMessage(WeArtMessageObjectSpecific):
 class SetForceMessage(WeArtMessageObjectSpecific):
     ID = "force"
 
-    def __init__(self, force:list[float]):
+    def __init__(self, force: list[float]):
         super().__init__()
         self._force = force
 
@@ -487,7 +598,6 @@ class StopForceMessage(WeArtMessageObjectSpecific):
 
     def getID(self):
         return self.ID
-    
 
     def getValues(self):
         ret = [HandsideToString(self._handSide), ActuationPointToString(self._actuationPoint)]
@@ -501,7 +611,7 @@ class StopForceMessage(WeArtMessageObjectSpecific):
 class SetTextureMessage(WeArtMessageObjectSpecific):
     ID = "texture"
 
-    def __init__(self, idx:int, vel:float, vol:float):
+    def __init__(self, idx: int, vel: float, vol: float):
         super().__init__()
         self._index = idx
         self._velocity = [0.5, 0.0, vel]
@@ -513,8 +623,7 @@ class SetTextureMessage(WeArtMessageObjectSpecific):
     def getValues(self):
         ret = []
         if (self._index < WeArtCommon.minTextureIndex or self._index > WeArtCommon.maxTextureIndex):
-            self._index = WeArtCommon.nullTextureIndex
-        
+            self._index = WeArtCommon.nullTextureIndex    
         ret.append(str(self._index))
         ret.append(str(self._velocity[0]))
         ret.append(str(self._velocity[1]))
@@ -524,7 +633,7 @@ class SetTextureMessage(WeArtMessageObjectSpecific):
         ret.append(ActuationPointToString(self._actuationPoint))
         return ret
 
-    def setValues(self, values:list[str]):
+    def setValues(self, values: list[str]):
         assert(len(values) == 6)
         self._index = int(values[0])
         self._velocity = []
@@ -535,7 +644,6 @@ class SetTextureMessage(WeArtMessageObjectSpecific):
         self._handSide = StringToHandside(values[5])
         self._actuationPoint = StringToActuationPoint(values[6])
 
-
 class StopTextureMessage(WeArtMessageObjectSpecific):
     ID = "stopTexture"
 
@@ -545,7 +653,6 @@ class StopTextureMessage(WeArtMessageObjectSpecific):
     def getID(self):
         return self.ID
     
-
     def getValues(self):
         ret = [HandsideToString(self._handSide), ActuationPointToString(self._actuationPoint)]
         return ret
@@ -555,9 +662,9 @@ class StopTextureMessage(WeArtMessageObjectSpecific):
         self._handSide = StringToHandside(values[0])
         self._actuationPoint = StringToActuationPoint(values[1])
 
-
 class RawDataOn(WeArtJsonMessage):
     ID = "RAW_DATA_ON"  
+    
     def __init__(self):
         super().__init__()
     
@@ -570,9 +677,9 @@ class RawDataOn(WeArtJsonMessage):
     def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
         return super().setActuationPoint(actuation_point)
 
-
 class RawDataOff(WeArtJsonMessage):
     ID = "RAW_DATA_OFF"  
+    
     def __init__(self):
         super().__init__()
     
@@ -587,10 +694,11 @@ class RawDataOff(WeArtJsonMessage):
     
 class RawSensorsData(WeArtJsonMessage):
     ID = "RAW_DATA"
+    
     def __init__(self):
         super().__init__()
         self._hand = None
-        self._sensors = {} #std::map<ActuationPoint, SensorData> sensors;
+        self._sensors = {}
 
     def getID(self):
         return self.ID
@@ -601,14 +709,13 @@ class RawSensorsData(WeArtJsonMessage):
     def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
         return
     
-    def getHand(self)->HandSide:
+    def getHand(self) -> HandSide:
         return self._hand
     
-    def hasSensor(self, ap:ActuationPoint) -> bool:
+    def hasSensor(self, ap: ActuationPoint) -> bool:
          return (ap in self._sensors)
-        
-    
-    def getSensor(self, ap:ActuationPoint) -> SensorData:
+         
+    def getSensor(self, ap: ActuationPoint) -> SensorData:
        return self._sensors[ap]
     
     def _serializePayload(self):
@@ -623,21 +730,71 @@ class RawSensorsData(WeArtJsonMessage):
         hs = payload["handSide"]
         self._hand = StringToHandside(hs)
         if "index" in payload:
-            self._sensors[ActuationPoint.Index] = dataclass_from_dict(SensorData, payload["index"])
+            self._sensors[ActuationPoint.Index]     = dataclass_from_dict(SensorData, payload["index"])
         if "thumb" in payload:
-            self._sensors[ActuationPoint.Thumb] = dataclass_from_dict(SensorData, payload["thumb"])
+            self._sensors[ActuationPoint.Thumb]     = dataclass_from_dict(SensorData, payload["thumb"])
         if "middle" in payload:
-            self._sensors[ActuationPoint.Middle] = dataclass_from_dict(SensorData, payload["middle"])
+            self._sensors[ActuationPoint.Middle]    = dataclass_from_dict(SensorData, payload["middle"])
         if "palm" in payload:
-            self._sensors[ActuationPoint.Palm] = dataclass_from_dict(SensorData, payload["palm"])
+            self._sensors[ActuationPoint.Palm]      = dataclass_from_dict(SensorData, payload["palm"])
 
-
-class AnalogSensorsData(WeArtJsonMessage):
-    ID = "RAW_SENSOR_ON_MASK"
+class RawDataTDPro(WeArtJsonMessage):
+    ID = "RAW_DATA_TD_PRO"
+    
     def __init__(self):
         super().__init__()
         self._hand = None
-        self._sensors = {} #std::map<ActuationPoint, AnalogSensorRawData> sensors;
+        self._sensors = {}
+
+    def getID(self):
+        return self.ID
+    
+    def setHandSide(self, handside: HandSide) -> None:
+        self._hand = handside
+
+    def setActuationPoint(self, actuation_point: ActuationPoint) -> None:
+        return
+    
+    def getHand(self) -> HandSide:
+        return self._hand
+    
+    def hasSensor(self, ap: ActuationPoint) -> bool:
+         return (ap in self._sensors)
+           
+    def getSensor(self, ap: ActuationPoint) -> SensorData:
+       return self._sensors[ap]
+    
+    def _serializePayload(self):
+        j = {}
+        j["handSide"] = self._hand
+        for s in self._sensors:
+            actuationPoint = ActuationPointToString(s).lower()
+            j[actuationPoint] = dict_from_dataclass(self._sensors[s])
+        return j
+    
+    def _deserializePayload(self, payload):
+        hs = payload["handSide"]
+        self._hand = StringToHandside(hs)
+        if "thumb" in payload:
+            self._sensors[ActuationPoint.Thumb]     = dataclass_from_dict(SensorData, payload["thumb"])
+        if "index" in payload:
+            self._sensors[ActuationPoint.Index]     = dataclass_from_dict(SensorData, payload["index"])
+        if "middle" in payload:
+            self._sensors[ActuationPoint.Middle]    = dataclass_from_dict(SensorData, payload["middle"])
+        if "annular" in payload:
+            self._sensors[ActuationPoint.Annular]    = dataclass_from_dict(SensorData, payload["annular"])
+        if "pinkky" in payload:
+            self._sensors[ActuationPoint.Pinky]     = dataclass_from_dict(SensorData, payload["pinky"])
+        if "palm" in payload:
+            self._sensors[ActuationPoint.Palm]      = dataclass_from_dict(SensorData, payload["palm"])
+
+class AnalogSensorsData(WeArtJsonMessage):
+    ID = "RAW_SENSOR_ON_MASK"
+    
+    def __init__(self):
+        super().__init__()
+        self._hand = None
+        self._sensors = {}
     
     def getID(self):
         return self.ID
@@ -651,10 +808,10 @@ class AnalogSensorsData(WeArtJsonMessage):
     def getHand(self) -> HandSide:
         return self._hand
     
-    def hasSensor(self, ap:ActuationPoint) -> bool:
+    def hasSensor(self, ap: ActuationPoint) -> bool:
         return ap in self._sensors
     
-    def getSensor(self, ap:ActuationPoint) -> AnalogSensorRawData:
+    def getSensor(self, ap: ActuationPoint) -> AnalogSensorRawData:
         return self._sensors[ap]
     
     def _serializePayload(self):
@@ -669,13 +826,13 @@ class AnalogSensorsData(WeArtJsonMessage):
         hs = payload["handSide"]
         self._hand = StringToHandside(hs)
         if "index" in payload:
-            self._sensors[ActuationPoint.Index] = dataclass_from_dict(AnalogSensorRawData, payload["index"])
+            self._sensors[ActuationPoint.Index]     = dataclass_from_dict(AnalogSensorRawData, payload["index"])
         if "thumb" in payload:
-            self._sensors[ActuationPoint.Thumb] = dataclass_from_dict(AnalogSensorRawData, payload["thumb"])
+            self._sensors[ActuationPoint.Thumb]     = dataclass_from_dict(AnalogSensorRawData, payload["thumb"])
         if "middle" in payload:
-            self._sensors[ActuationPoint.Middle] = dataclass_from_dict(AnalogSensorRawData, payload["middle"])
+            self._sensors[ActuationPoint.Middle]    = dataclass_from_dict(AnalogSensorRawData, payload["middle"])
         if "palm" in payload:
-            self._sensors[ActuationPoint.Palm] = dataclass_from_dict(AnalogSensorRawData, payload["palm"])
+            self._sensors[ActuationPoint.Palm]      = dataclass_from_dict(AnalogSensorRawData, payload["palm"])
 
 class GetMiddlewareStatus(WeArtJsonMessage):
 
@@ -709,11 +866,34 @@ class MiddlewareStatusMessage(WeArtJsonMessage):
             self.__data.timestamp = self._timestamp
         except:
             pass
-        
+
+class WeArtAppStatusMessage(WeArtJsonMessage):
+    
+    ID = "WA_STATUS"
+
+    def __init__(self):
+        super().__init__()
+        self.__data = None #MiddlewareStatusData _data;
+
+    def getID(self) -> str:
+        return self.ID
+
+    def data(self) -> WeArtAppStatusData:
+        return self.__data
+    
+    def _serializePayload(self) -> dict:
+        return dict_from_dataclass(self.__data)
+    
+    def _deserializePayload(self, payload:dict) -> None:
+        self.__data = dataclass_from_dict(WeArtAppStatusData, payload)
+        try:
+            self.__data.timestamp = self._timestamp
+        except:
+            pass
 
 class GetDevicesStatusMessage(WeArtJsonMessage):
-
     ID = "DEVICES_GET_STATUS"
+    
     def __init__(self):
         super().__init__()
     
@@ -725,7 +905,7 @@ class DevicesStatusMessage(WeArtJsonMessage):
 
     def __init__(self):
         super().__init__()
-        self.__devices = [] #std::vector<ConnectedDeviceStatus> _devices;
+        self.__devices = []
 
     def getID(self):
         return self.ID
@@ -738,21 +918,28 @@ class DevicesStatusMessage(WeArtJsonMessage):
         j["devices"] = dict_from_dataclass(self.__devices)
         return j
     
-    def _deserializePayload(self, payload:dict) -> None:
+    def _deserializePayload(self, payload: dict) -> None:
         if "devices" in payload:
             self.__devices = dataclass_from_list(ConnectedDeviceStatus, payload["devices"])
 
+class TDProStatusMessage(WeArtJsonMessage):
+    ID = "WEART_TD_PRO_STATUS"
 
+    def __init__(self):
+        super().__init__()
+        self.__devices = []
 
-
-
-
-
-
+    def getID(self):
+        return self.ID
     
-
-
-  
-
-
-
+    def devices(self) -> list:
+        return self.__devices
+    
+    def _serializePayload(self) -> dict:
+        j = {}
+        j["devices"] = dict_from_dataclass(self.__devices)
+        return j
+    
+    def _deserializePayload(self, payload: dict) -> None:
+        if "devices" in payload:
+            self.__devices = dataclass_from_list(G2DeviceStatus, payload["devices"])

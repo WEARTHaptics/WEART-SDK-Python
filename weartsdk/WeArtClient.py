@@ -1,34 +1,42 @@
 import socket
 import sys
-import signal
-import time
 from threading import Thread
 from enum import Enum
 import logging
 
-from . import WeArtCommon
 from .WeArtCommon import TrackingType
 from . import WeArtMessages as WeArtMessages
 from .WeArtMessageSerializer import WeArtMessageSerializer
 from  .WeArtThimbleTrackingObject import WeArtThimbleTrackingObject
 from .WeArtMessageListener import WeArtMessageListener
-from .WeArtTrackingRawData import WeArtTrackingRawData
-from .WeArtAnalogSensorData import WeArtAnalogSensorData
 
 
 logging.basicConfig()
 
 class WeArtClient:
+    """
+    A client class to communicate with a server using socket connections. 
+    The client can send and receive messages, handle connections, and track thimbles. 
+
+    Attributes:
+        messagesSeparator (str): The separator used to delimit messages.
+    """
     messagesSeparator = '~'
 
     def __init__(self, ip_address, port, log_level = logging.DEBUG):
+        """
+        Initializes a WeArtClient instance.
+
+        :param ip_address: The IP address of the server to connect to.
+        :param port: The port number to use for the connection.
+        :param log_level: The logging level (default is logging.DEBUG).
+        """
         self._messageSerializer = WeArtMessageSerializer()
         self.__Connected = False
         self.__Closing = False
         self.__s = None #socket
         self.__thimbleTrackingObjects = []
         self.__messageListeners = []
-        self.__messageCallbacks = []
         self.__connectionStatusCallbacks = []
         self.__errorCallbacks = []
         self.__pendingCallbacks = []
@@ -43,18 +51,29 @@ class WeArtClient:
         ReceiveMessageError = 2
 
     def Start(self, tracking_type = TrackingType.WEART_HAND):
+        """
+        Sends a start message to connected device(s) based on the tracking type.
+
+        :param tracking_type: The tracking type to use (default is WEART_HAND).
+        """
         start_msg = None
         if tracking_type != None:
             start_msg = WeArtMessages.StartFromClientMessage(trackType=tracking_type)
         else:
             start_msg = WeArtMessages.StartFromClientMessage()
-        self.SendMessage(start_msg)
+        self._sendMessage(start_msg)
         
     def Stop(self):
+        """
+        Sends a stop message to connected device(s).
+        """
         stop_msg = WeArtMessages.StopFromClientMessage()
-        self.SendMessage(stop_msg)
+        self._sendMessage(stop_msg)
     
     def Run(self):
+        """
+        Establishes a socket connection with the Middleware or WeArtApp.
+        """
         try:
             self.__s = socket.socket()
             server_addr = (self.__IP_ADDRESS, self.__PORT)
@@ -65,45 +84,135 @@ class WeArtClient:
             t = Thread(target=self._OnReceive, args = [], daemon=True)
             t.start()
 
-            #getStatusMessage = WeArtMessages.GetMiddlewareStatus()
-            #self.SendMessage(getStatusMessage)
-
-            getDevicesMessage = WeArtMessages.GetDevicesStatusMessage()
-            self.SendMessage(getDevicesMessage)
-
         except socket.error as e:
             self.__logger.error(f"Unable to connect to server { server_addr }... \n{e}")
             self.__Connected = False
             self.__NotifyError(self.ErrorType.ConnectionError)
             sys.exit()
+        
         return
     
     def IsConnected(self):
+        """
+        Checks if the Middleware or the WeArtApp is connected.
+
+        :return: True if connected, False otherwise.
+        """
         return self.__Connected
     
     def Close(self):
+        """
+        Closes the socket connection with the Middleware or WeArtApp.
+        """
         self.__Closing = True
         self.__s.close()
         self.__Connected = False
         self.__NotifyConnectionStatus(False)
 
     def StartCalibration(self):
+        """
+        Starts the calibration process.
+        """
         startCalibration = WeArtMessages.StartCalibrationMessage()
-        self.SendMessage(startCalibration)
+        self._sendMessage(startCalibration)
 
     def StopCalibration(self):
+        """"
+        Stops the calibration process.
+        """
         stopCalibration = WeArtMessages.StopCalibrationMessage()
-        self.SendMessage(stopCalibration)
+        self._sendMessage(stopCalibration)
 
     def StartRawData(self):
+        """"
+        Starts the raw data collection from the device(s).
+        """
         message = WeArtMessages.RawDataOn()
-        self.SendMessage(message)
+        self._sendMessage(message)
 
     def StopRawData(self):
+        """""
+        Stops the raw data collection from the device(s).
+        """
         message = WeArtMessages.RawDataOff()
-        self.SendMessage(message)
+        self._sendMessage(message)
     
-    def SendMessage(self, msg:WeArtMessages.WeArtMessage):
+    def AddThimbleTracking(self, trackingObject: WeArtThimbleTrackingObject):
+        """
+        Adds a thimble tracking object to the list of tracked thimbles.
+        Once a thimble tracking object is added, the client will start receiving tracking data from the device(s).
+        
+        :param trackingObjects: The WeArtThimbleTrackingObject to add.
+        """
+        self.__thimbleTrackingObjects.append(trackingObject)
+        self.AddMessageListener(trackingObject)
+
+    def RemoveThimbleTracking(self, trackingObject: WeArtThimbleTrackingObject):
+        """
+        Removes a thimble tracking object from the list of tracked thimbles.
+        Once a thimble tracking object is removed, the client will stop receiving tracking data from the device(s).
+
+        :param trackingObjects: The WeArtThimbleTrackingObject to remove.
+        """
+        if trackingObject in self.__thimbleTrackingObjects:
+            self.__thimbleTrackingObjects.remove(trackingObject)
+
+    def ThimbleTrackingObjectsSize(self):
+        """
+        Returns the number of thimble tracking objects currently being tracked.
+
+        :return: The number of thimble tracking objects.
+        """
+        return len(self.__thimbleTrackingObjects)
+    
+    def AddMessageListener(self, listener: WeArtMessageListener):
+        """
+        Adds a message listener to the list of message listeners.
+        A message listener handles incoming messages from the Middleware or WeArtApp anddevice(s).
+        \nYou can add:
+            * MiddlewareStatusListener: to receive Middleware or WeArtApp status messages.
+            * DeviceStatusListener: to receive TouchDiver device(s) status messages.
+            * TDProStatusListener: to receive TouchDiver Pro device(s) status messages.
+            * WeArtTrackingCalibration: to receive calibration status messages.
+            * WeArtTrackingRawData: to receive raw data from device(s).
+
+        :param listener: The WeArtMessageListener to add.
+        """
+        self.__messageListeners.append(listener)
+
+    def RemoveMessageListener(self, listener: WeArtMessageListener):
+        '''
+        Removes a message listener from the list of message listeners.
+
+        :param listener: The WeArtMessageListener to remove.
+        '''
+        if listener in self.__messageListeners:
+            self.__messageListeners.remove(listener)
+
+    def AddConnectionStatusCallback(self, callback):
+        '''
+        Adds a callback function to be called when the connection status changes.
+        The callback function should take a boolean parameter indicating the new connection status: True if connected, False otherwise.
+
+        :param callback: The callback function to be called.
+        '''
+        self.__connectionStatusCallbacks.append(callback)
+
+    def AddErrorCallback(self, callback):
+        '''
+        Adds a callback function to be called when an error occurs.
+        The callback function should take a :class:`ErrorType` parameter indicating the error.
+
+        :param callback: The callback function to be called.
+        '''
+        self.__errorCallbacks.append(callback)
+    
+    def _sendMessage(self, msg: WeArtMessages.WeArtMessage):
+        """
+        Sends a serialized message to the server.
+
+        :param msg: The message to be sent.
+        """
         if not self.__Connected:
             return
         if msg == None:
@@ -123,40 +232,10 @@ class WeArtClient:
             self.__NotifyConnectionStatus(False)
             return
 
-
-    def AddThimbleTracking(self, trackingObjects: WeArtThimbleTrackingObject):
-        self.__thimbleTrackingObjects.append(trackingObjects)
-        self.AddMessageListener(trackingObjects)
-
-    def AddThimbleRawSensors(self, rawSensorData: WeArtTrackingRawData):
-        return
-    
-    def AddThimbleAnalogRawSensor(self, analogRawSensorData: WeArtAnalogSensorData):
-        return
-        
-    def SizeThimbles(self):
-        return len(self.__thimbleTrackingObjects)
-    
-    def AddMessageListener(self, listener: WeArtMessageListener):
-        self.__messageListeners.append(listener)
-
-    def AddMessageCallback(self, callback):
-        return
-
-    def RemoveMessageListener(self, listener: WeArtMessageListener):
-        if listener in self.__messageListeners:
-            self.__messageListeners.remove(listener)
-
-    def RemoveMessageCallback(self, callback):
-        return
-
-    def AddConnectionStatusCallback(self, callback):
-        self.__connectionStatusCallbacks.append(callback)
-
-    def AddErrorCallback(self, callback):
-        self.__errorCallbacks.append(callback)
-    
     def _OnReceive(self):
+        '''
+        Handles incoming messages from the server.
+        '''
         try:
             while True:
                 data = self.__s.recv(4096)
@@ -171,7 +250,10 @@ class WeArtClient:
             if not self.__Closing:
                 raise
     
-    def __ForwardingMessages(self, messages:list[WeArtMessages.WeArtMessage]):
+    def __ForwardingMessages(self, messages: list[WeArtMessages.WeArtMessage]):
+        '''
+        Forwards messages to the message listener(s).
+        '''
         for msg in messages:
             if msg == None:
                 continue
@@ -179,14 +261,20 @@ class WeArtClient:
                 if (listener.accept(msg.getID())):
                     listener.OnMessageReceived(msg)
     
-    def __NotifyConnectionStatus(self, connected:bool):
+    def __NotifyConnectionStatus(self, connected: bool):
+        '''
+        Notifies the connection status to the connection status callback(s).
+        '''
         for callback in self.__connectionStatusCallbacks:
             t = Thread(target=callback, args = [connected])
             t.start()
             self.__pendingCallbacks.append(t)
         self.__ClearProcessedCallbacks()
     
-    def __NotifyError(self, errorType:ErrorType):
+    def __NotifyError(self, errorType: ErrorType):
+        '''
+        Notifies the error to the error callback(s).
+        '''
         for callback in self.__errorCallbacks:
             t = Thread(target=callback, args = [errorType])
             t.start()
@@ -194,6 +282,9 @@ class WeArtClient:
         self.__ClearProcessedCallbacks()
     
     def __ClearProcessedCallbacks(self):
+        ''''
+        Clears the processed callbacks.
+        '''
         for t in self.__pendingCallbacks:
             t.join()
 

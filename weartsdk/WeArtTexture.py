@@ -2,11 +2,9 @@ from .WeArtCommon import TextureType
 
 class WeArtTexture:
     DefaultTextureType = TextureType.ClickNormal
-    
     DefaultVolume = 100.0
     MinVolume = 0.0
     MaxVolume = 100.0
-
     DefaultVelocity = 0.0
     MinVelocity = 0.0
     MaxVelocity = 0.5
@@ -22,7 +20,7 @@ class WeArtTexture:
         return self.__textureVelocity
     
     @textureVelocity.setter
-    def textureVelocity(self, velocity:float):
+    def textureVelocity(self, velocity: float):
         if velocity < self.MinVelocity:
             self.__textureVelocity = self.MinVelocity
         elif velocity > self.MaxVelocity:
@@ -35,10 +33,9 @@ class WeArtTexture:
         return self.__textureType
     
     @textureType.setter
-    def textureType(self, texture_type:TextureType):
+    def textureType(self, texture_type: TextureType):
         lower = TextureType.ClickNormal
         upper = TextureType.DoubleSidedTape
-
         if texture_type.value <= lower.value:
             self.__textureType = lower
         elif texture_type.value >= upper.value:
@@ -51,7 +48,7 @@ class WeArtTexture:
         return self.__volume
     
     @volume.setter
-    def volume(self, volume:float):
+    def volume(self, volume: float):
         if volume < self.MinVolume:
             self.__volume = self.MinVolume
         elif volume > self.MaxVolume:
@@ -60,7 +57,10 @@ class WeArtTexture:
             self.__volume = volume
 
     def __eq__(self, other):
-        if (self.active == other.active and self.__textureType == other.textureType and self.__textureVelocity == other.textureVelocity and self.__volume == other.volume):
+        if (self.active == other.active and 
+            self.__textureType == other.textureType and 
+            self.__textureVelocity == other.textureVelocity and 
+            self.__volume == other.volume):
             return True
         else:
             return False
