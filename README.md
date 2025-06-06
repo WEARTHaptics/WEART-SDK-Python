@@ -102,6 +102,8 @@ Middleware status includes the following information:
 * **connected devices**: the list of connected devices  
 
 The following fields are available only for TouchDIVER PRO:
+* **warning code**: the warning code of the WEART-App (listed below)
+* **warning description**: the warning description of the WEART-App
 * **connection type**: how the WEART-App is connected to the device(s)  
 * **autoconnection**: whether autoconnection is enabled or not  
 * **tracking playback**: whether the tracking playback is enabled or not  
@@ -120,7 +122,9 @@ An example of a `MiddlewareStatusUpdate` object:
 - `actuationsEnabled`: `bool` → `True`  
 - `connectedDevices`: `List[MiddlewareConnectedDevice]` →  
   - `MiddlewareConnectedDevice(macAddress="00:1A:7D:DA:71:13", handSide=HandSide.LEFT)`  
-  - `MiddlewareConnectedDevice(macAddress="00:1A:7D:DA:71:14", handSide=HandSide.RIGHT)`  
+  - `MiddlewareConnectedDevice(macAddress="00:1A:7D:DA:71:14", handSide=HandSide.RIGHT)`
+- `warningCode`: `int` → `0`  *(TouchDIVER PRO only)*
+- `warningDesc`: `str` → `""`  *(TouchDIVER PRO only)*
 - `connectionType`: `str` → `"USB"`  *(TouchDIVER PRO only)*  
 - `autoconnection`: `bool` → `True`  *(TouchDIVER PRO only)*  
 - `trackingPlayback`: `bool` → `False`  *(TouchDIVER PRO only)*  
@@ -150,6 +154,16 @@ The status codes (along with their description) are:
 | 300 | STOP_GENERIC_ERROR | Generic error occurred while stopping session |
 
 **⚠️ Important:** The description of each status code might change between different Middleware versions, use the status code to check instead of the description.
+
+### Warning Codes
+The warning codes (along with their description) are:
+
+| Warning Code |   | Description |
+|---|---|---|
+| 0 | OK | Ok |
+| 100 | GENERIC_WARNING | Check WeArtApp |
+| 101 | BATTERY_LOW | Device battery is low |
+| 102 | SIGNAL_WEAK | Connection signal is weak |
 
 You can get Middleware or WEART-App status by asking it anytime or using appropriate callbacks that are called when the status changes.
 

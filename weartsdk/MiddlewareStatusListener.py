@@ -17,6 +17,8 @@ class MiddlewareStatusUpdate:
         version (str): The version of the middleware.
         statusCode (int): The status code representing middleware state.
         errorDesc (str): A description of any error that occurred.
+        warningCode (int): The warning code representing WeArtApp warning state (TD Pro only).
+        warningDesc (str): A description of any warning that occurred (TD Pro only).
         actuationsEnabled (bool): Indicates if actuation is enabled.
         connectionType (str): The type of connection used (TD Pro only).
         autoconnection (bool): Indicates if autoconnection is enabled (TD Pro only).
@@ -30,6 +32,8 @@ class MiddlewareStatusUpdate:
     version: str = ""
     statusCode: int = 0
     errorDesc: str = ""
+    warningCode: int = 0                # G2 ONLY
+    warningDesc: str = ""               # G2 ONLY
     actuationsEnabled:bool = False
     connectionType: str = "NONE"        # G2 ONLY
     autoconnection: bool = False        # G2 ONLY
@@ -90,6 +94,8 @@ class MiddlewareStatusListener(WeArtMessageListener):
             self.__data.version = newStatus.version
             self.__data.statusCode = newStatus.statusCode
             self.__data.errorDesc = newStatus.errorDesc
+            self.__data.warningCode = newStatus.warningCode
+            self.__data.warningDesc = newStatus.warningDesc
             self.__data.actuationsEnabled = newStatus.actuationsEnabled
             self.__data.connectionType = newStatus.connectionType
             self.__data.autoconnection = newStatus.autoconnection

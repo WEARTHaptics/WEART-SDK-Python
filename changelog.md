@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and follo
 
 ## [Unreleased]
 
+## [2.0.1] - 2025-06-06
+### Added
+- Warning messages are now handled
+
+### Changed
+- Readme file
+- Changelog file
+
 ## [2.0.0] - 2025-04-03
 ### Added
 - Changelog file

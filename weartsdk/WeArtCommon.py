@@ -321,6 +321,8 @@ class WeArtAppStatusData:
         version (str): The version of the WeArt App.
         statusCode (int): A code representing the status of the WeArt App.
         errorDesc (str): A description of any error in the WeArt App.
+		warningCode (int): The warning code representing WeArtApp warning state.
+        warningDesc (str): A description of any warning that occurred.
         actuationsEnabled (bool): Whether actuations are enabled in the WeArt App.
         connectionType (str): The type of connection (e.g., 'BLE').
         autoconnection (bool): Whether auto-connection is enabled.
@@ -334,6 +336,8 @@ class WeArtAppStatusData:
 	version: str
 	statusCode: int
 	errorDesc: str
+	warningCode: int
+	warningDesc: str
 	actuationsEnabled: bool
 	connectionType: str
 	autoconnection: bool
