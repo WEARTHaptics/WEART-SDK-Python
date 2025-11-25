@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and follo
 
 ## [Unreleased]
 
+## [2.0.2] - 2025-11-25
+### Changed
+- Fix typo "pinkky" in WeArtMessages.py
+- Fix fallback zero-data Sample (AttributeError bug) in WeArtTrackingRawData.py
+- Changelog file
+
 ## [2.0.1] - 2025-06-06
 ### Added
 - Warning messages are now handled
