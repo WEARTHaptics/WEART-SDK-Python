@@ -783,7 +783,7 @@ class RawDataTDPro(WeArtJsonMessage):
             self._sensors[ActuationPoint.Middle]    = dataclass_from_dict(SensorData, payload["middle"])
         if "annular" in payload:
             self._sensors[ActuationPoint.Annular]    = dataclass_from_dict(SensorData, payload["annular"])
-        if "pinkky" in payload:
+        if "pinky" in payload:
             self._sensors[ActuationPoint.Pinky]     = dataclass_from_dict(SensorData, payload["pinky"])
         if "palm" in payload:
             self._sensors[ActuationPoint.Palm]      = dataclass_from_dict(SensorData, payload["palm"])

@@ -1,5 +1,5 @@
 from .WeArtMessageListener import WeArtMessageListener
-from .WeArtCommon import HandSide, ActuationPoint, SensorData
+from .WeArtCommon import HandSide, ActuationPoint, SensorData, AccelerometerData, GyroscopeData, TofData
 from .WeArtMessages import WeArtMessage, RawSensorsData, RawDataTDPro
 from dataclasses import dataclass
 
@@ -55,7 +55,7 @@ class WeArtTrackingRawData(WeArtMessageListener):
             Sample: The last recorded sample.
         """
         if len(self.__samples) == 0:
-            return Sample(0, SensorData(0, 0, 0))
+            return Sample(0, SensorData(AccelerometerData(), GyroscopeData(), TofData()))
         return self.__samples[-1]
 
     def AddSampleCallback(self, callback):
