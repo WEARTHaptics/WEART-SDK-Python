@@ -583,7 +583,10 @@ for _ in range(100):
 
 ## WeArtTrackingRawData
 This object represents the raw sensors data received from the thimble(s).
-Raw data are accelerometer, gyroscope and time-of-flight data.
+Raw data are:
+* 3-axis accelerometer [expressed in 'g']
+* 3-axis gyroscope [expressed in 'deg/s']
+* Time of Flight sensor <b>(not available for TouchDIVER Pro)</b> [expressed in millimetres between the finger and palm]
 
 **⚠️ Important:** Time-of-flight data are not available for TouchDIVER Pro devices as they don't have a time-of-flight sensor installed.
 
