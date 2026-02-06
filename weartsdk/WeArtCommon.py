@@ -2,6 +2,7 @@ from enum import IntFlag
 from dataclasses import dataclass, field
 import dataclasses
 from typing import List
+from datetime import datetime
 
 class TrackingType(IntFlag):
 	"""
@@ -448,12 +449,14 @@ class G2DeviceStatus:
         macAddress (str): The MAC address of the Touh Diver Pro device.
         handSide (HandSide): The hand side of the device (left or right).
         signalStrength (float): The signal strength of the device (in dBm).
+		sensorsCalibDate (datetime): The date and time of the last calibration of the device sensors.
         master (G2MasterStatus): The master status of the Touh Diver Pro device.
         nodes (List[G2NodeStatus]): The list of nodes in the Touh Diver Pro device.
     """
 	macAddress: str
 	handSide: HandSide
 	signalStrength: float
+	sensorsCalibDate: datetime
 	master: G2MasterStatus
 	nodes: List[G2NodeStatus] = field(default_factory=lambda: [G2NodeStatus()])
 
@@ -540,6 +543,9 @@ def dataclass_from_dict(klass, d):
 			return HandSide[str(d).capitalize()]
 		if klass == List[ThimbleStatus]:
 			return dataclass_from_list(ThimbleStatus, d)
+		if klass is datetime:
+			# Expect ISO 8601 string (C# DateTime style)
+			return datetime.fromisoformat(d.replace("Z", "+00:00") if isinstance(d, str) else d)
 		
 		# If the type of class is not a dataclass, return the dictionary
 		return d
@@ -562,13 +568,15 @@ def dict_from_dataclass(k):
 		for elem in k:
 			l.append(dict_from_dataclass(elem))
 		return l
+	elif isinstance(k, datetime):
+		return k.isoformat()
 
 
 
 DEFAULT_IP_ADDRESS = "127.0.0.1"
 DEFAULT_TCP_PORT = 13031
 
-WEART_SDK_VERSION = "2.0.0"
+WEART_SDK_VERSION = "2.0.3"
 WEART_SDK_TYPE = "SdkLLPY"
 
 defaultTemperature = 0.5

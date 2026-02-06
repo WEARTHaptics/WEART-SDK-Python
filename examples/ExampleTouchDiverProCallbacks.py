@@ -41,7 +41,8 @@ def tdProStatusUpdateCallback(status):
 			print("Device hand side is: " + str(device.handSide))
 			print("Device signal strength is: " + str(device.signalStrength))
 			print("Device battery level is: " + str(device.master.batteryLevel))
-
+			print("Device sensors last calibrated at " + str(device.sensorsCalibDate))
+      
 def calibrationStatusCallback(handside, status):
         print(f"Calibration status for {str(handside)} hand is {str(status)}")
 

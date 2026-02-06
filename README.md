@@ -145,6 +145,9 @@ The status codes (along with their description) are:
 | 105 | SET_IMU_SAMPLE_RATE_ERROR | Error while setting IMU Sample Rate! Device Disconnected! |
 | 106 | RUNNING_SENSOR_ON_MASK | Inconsistency on Analog Sensors raw data! Please try again or Restart your device/s! |
 | 107 | RUNNING_DEVICE_CHARGING | Can't start while the devices are connected to the power supply |
+| 108 | BATTERY_REMOVED | Battery is removed, please insert a battery or device will shut down |
+| 109 | BATTERY_LOW_WARNING | Battery low, please connect the device to a power supply |
+| 111 | BATTERY_FAULT_ERROR | Battery has a fault, please contact the support team
 | 200 | CONSECUTIVE_TRACKING_ERRORS | Too many consecutive running sensor errors, stopping session |
 | 201 | DONGLE_DISCONNECT_RUNNING | BLE Dongle disconnected while running, stopping session |
 | 202 | TD_DISCONNECT_RUNNING | TouchDIVER disconnected while running, stopping session |
@@ -296,6 +299,7 @@ Each device status includes the following information:
 * **mac address**: the MAC address of the device
 * **handSide**: the side of the device
 * **signal strength**: the signal strength of the device (in dBm)
+* **sensor calibration date**: the date and time of the last sensor calibration
 * **master status**: the status of the master device
 * **slave status**: the list of slave devices' status
 
@@ -330,7 +334,8 @@ Each slave status includes the following information:
 #### `G2DeviceStatus` fields:
 - `macAddress`: `str` → `"00:1A:7D:DA:71:15"`  
 - `handSide`: `HandSide` → `HandSide.LEFT`  
-- `signalStrength`: `float` → `-60.5`  
+- `signalStrength`: `float` → `-60.5`
+- `sensorsCalibDate`: `datetime` → `"2026-02-03T09:03:03Z"`  
 - `master`: `G2MasterStatus` →  
   - `batteryLevel`: `int` → `90`  
   - `charging`: `bool` → `False`  
@@ -394,6 +399,7 @@ if tdProStatus.devices.len() > 0:
 		print("Device hand side is: " + str(device.handSide))
 		print("Device signal strength is: " + str(device.signalStrength))
 		print("Device battery level is: " + str(device.master.batteryLevel))
+		print("Device sensors last calibrated at " + str(device.sensorsCalibDate))
 ```
 
 #### Using callbacks
@@ -408,6 +414,7 @@ def tdProStatusUpdateCallback(status):
 			print("Device hand side is: " + str(device.handSide))
 			print("Device signal strength is: " + str(device.signalStrength))
 			print("Device battery level is: " + str(device.master.batteryLevel))
+			print("Device sensors last calibrated at " + str(device.sensorsCalibDate))
 
 # Create a listener to receive status from device
 tdProStatusListener = TDProStatusListener()

@@ -43,6 +43,7 @@ if __name__ == '__main__':
     deviceStatus = tdpListener.LastStatus()
     for i, device in enumerate(deviceStatus.devices):
         print(f"Device {i} connected with MAC address {device.macAddress}, hand side {device.handSide} has battery at {device.master.batteryLevel}%")
+        print(f"Device {i} sensors last calibrated at {device.sensorsCalibDate}")
 
     # Start the device(s)
     client.Start()

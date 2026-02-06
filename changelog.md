@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and follo
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-02-06
+### Added
+- sensorsCalibDate field to G2DeviceStatus
+- Logging of sensor calibration date in examples
+
+### Changed
+- Changelog file
+- Readme file
+
 ## [2.0.2] - 2025-11-25
 ### Changed
 - Fix typo "pinkky" in WeArtMessages.py
