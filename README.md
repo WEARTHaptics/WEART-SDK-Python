@@ -670,4 +670,4 @@ A special thank you for the support and collaboration in the realization of this
 the project “Phygital Twin Technologies for innovative Surgical Training and Planning”.
 
 # Copyright
-Copyright &copy; 2025 Weart S.r.l.
+Copyright &copy; 2026 Weart S.r.l.
